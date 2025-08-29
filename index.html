@@ -156,7 +156,8 @@
       <h1><i class="fas fa-search"></i> Part Finder</h1>
       <p>Search our extensive inventory of diesel engine parts</p>
 
-      <div class="cart-icon-header" onclick="toggleCart()">
+      <div class="cart-icon-header" onclick="toggleCartAndScroll()">
+
         <i class="fas fa-shopping-cart"></i>
         <div class="cart-count" id="cart-count">0</div>
       </div>
@@ -845,6 +846,16 @@ ${customerBlock}
       $status.innerHTML = '<i class="fas fa-info-circle"></i> Type a part number (e.g., 3802010) or keyword to begin.';
     }
   })();
+  // Scroll to cart when header cart icon is clicked
+window.toggleCartAndScroll = function() {
+    toggleCart(); // toggles cart visibility
+    setTimeout(() => {
+        const cartSection = document.getElementById('cart-content');
+        if (cartSection && cartSection.style.display === 'block') {
+            cartSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, 150); // delay allows cart to open before scrolling
+}; 
   </script>
 </body>
 </html>
