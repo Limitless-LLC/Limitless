@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,8 +68,6 @@
         .action-btn { flex: 1; text-align: center; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 500; transition: .3s; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; cursor: pointer; }
         .cart-btn { background: #2c3e50; color: white; border: 2px solid #2c3e50; }
         .cart-btn:hover { background: #1a202c; }
-        .cart-btn.go-to-cart { background: #38a169; border-color: #38a169; }
-        .cart-btn.go-to-cart:hover { background: #2f855a; }
         .whatsapp-btn { background: white; color: #25D366; border: 2px solid #25D366; }
         .whatsapp-btn:hover { background: #25D366; color: white; }
 
@@ -157,7 +156,7 @@
       <h1><i class="fas fa-search"></i> Part Finder</h1>
       <p>Search our extensive inventory of diesel engine parts</p>
 
-      <div class="cart-icon-header" onclick="scrollToCart()">
+      <div class="cart-icon-header" onclick="toggleCart()">
         <i class="fas fa-shopping-cart"></i>
         <div class="cart-count" id="cart-count">0</div>
       </div>
@@ -183,7 +182,7 @@
 
     <div class="results-grid" id="lf-results"></div>
 
-    <div class="cart-section" id="cart-section">
+    <div class="cart-section">
       <div class="cart-header">
         <div class="cart-title"><i class="fas fa-shopping-cart"></i> Your Cart</div>
         <button class="cart-toggle" onclick="toggleCart()"><i class="fas fa-eye"></i> Show Cart</button>
@@ -325,7 +324,6 @@
             const $cartTotal = document.getElementById('cart-total');
             const $cartCount = document.getElementById('cart-count');
             const $coreBadgeHeader = document.getElementById('core-badge-header');
-            const $cartSection = document.getElementById('cart-section');
 
             const $paymentMethod = document.getElementById('payment-method');
             const $paymentNote = document.getElementById('payment-note');
@@ -429,15 +427,6 @@
       return ok;
     }
 
-    // NEW: Function to scroll to cart section
-    function scrollToCart() {
-      $cartSection.scrollIntoView({ behavior: 'smooth' });
-      // Also open the cart if it's closed
-      if ($cartContent.style.display !== 'block') {
-        toggleCart();
-      }
-    }
-
             let rows = [];
             try {
                 $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading parts catalog...';
@@ -474,323 +463,386 @@
                 $status.innerHTML = '<i class="fas fa-check-circle"></i> Catalog loaded with ' + rows.length.toLocaleString() + ' parts. Start searching above.';
             } catch (e) {
                 console.error("Catalog fetch error:", e);
-                $status.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Couldn\'t load catalog. Please check the CSV URL.';
+                $status.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Couldn\'t load catalog: ' + (e.message || e) + '. Please check your CSV URL.';
                 return;
             }
 
             const fuse = new Fuse(rows, {
-                keys: [
-                    { name: "__pn_norm", weight: 0.7 },
-                    { name: "__alts_norm", weight: 0.3 },
-                    { name: "description", weight: 0.2 }
-                ],
+                includeScore: true,
                 threshold: 0.3,
-                includeScore: true
+                keys: [
+                    { name: "__pn", weight: 0.7 },
+                    { name: "alt_pns", weight: 0.3 },
+                    { name: "description", weight: 0.2 }
+                ]
             });
 
-            function search() {
-                const q = $in.value.trim();
-                if (!q) {
-                    $results.innerHTML = "";
-                    $status.innerHTML = '<i class="fas fa-info-circle"></i> Enter a part number or description to search.';
-                    return;
-                }
+            function renderCard(r) {
+                const img = r.image_url 
+                    ? `<div class="card-image"><img src="${r.image_url}" alt="${r.__pn}"></div>`
+                    : `<div class="card-image" style="color:#888;font-size:14px;">
+                           <i class="fas fa-image" style="font-size:48px;opacity:.3;"></i><br>No Image Available
+                       </div>`;
 
-                $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Searching...';
-                setTimeout(() => {
-                    let results = [];
-                    const exact = $exact.checked;
-                    const alt = $alt.checked;
-                    const instock = $instock.checked;
+                const price = fmtMoney(r.__price_num, r.currency);
+                const stockStatus = (r.__stock_num > 0) ? "In Stock" : (r.__lead_num > 0 ? `Lead ${r.__lead_num}d` : "Call for Availability");
+                const stockClass = (r.__stock_num > 0) ? "stock" : "core";
+                const alt = (r.alt_pns || "").toString().split(/[;,]/).map(s=>s.trim()).filter(Boolean);
+                const alts = alt.length ? `<div class="alt-pns"><strong>Alternate Part Numbers:</strong> ${alt.join(", ")}</div>` : "";
+                const inCart = cart.some(item => item.__pn_norm === r.__pn_norm);
+                const cartButtonText = inCart ? "Added to Cart" : "Add to Cart";
+                const cartButtonIcon = inCart ? "fa-check" : "fa-cart-plus";
+                const coreBadge = r.__core_num > 0 ? `
+                    <div class="core-badge" title="Core Charge: ${fmtMoney(r.__core_num, r.currency)}. Refunded upon return of the used part per supplier policy.">
+                        <i class="fas fa-exclamation-circle"></i> Core
+                    </div>` : '';
 
-                    if (exact) {
-                        const qn = norm(q);
-                        results = rows.filter(r => {
-                            if (r.__pn_norm === qn) return true;
-                            if (alt && r.__alts_norm.includes(qn)) return true;
-                            return false;
-                        });
-                    } else {
-                        results = fuse.search(q).map(x => x.item);
-                    }
-
-                    if (instock) results = results.filter(r => r.__stock_num > 0);
-
-                    if (!results.length) {
-                        $status.innerHTML = '<i class="fas fa-times-circle"></i> No matching parts found. Try a different search term or adjust filters.';
-                        $results.innerHTML = "";
-                        return;
-                    }
-
-                    $status.innerHTML = '<i class="fas fa-check-circle"></i> Found ' + results.length.toLocaleString() + ' matching parts.';
-                    renderResults(results);
-                }, 100);
-            }
-
-            function renderResults(rows) {
-                $results.innerHTML = rows.map(r => {
-                    const inCart = cart.find(x => x.__pn === r.__pn);
-                    const qty = inCart ? inCart.qty : 1;
-                    const isCore = r.__core_num > 0;
-                    const inStock = r.__stock_num > 0;
-                    const stockText = inStock ? `In Stock (${r.__stock_num})` : `Lead Time: ${r.__lead_num || '?'} days`;
-                    const stockClass = inStock ? 'stock' : 'lead';
-                    
-                    return `
-                        <div class="result-card" data-pn="${esc(r.__pn)}">
-                            ${isCore ? `<div class="core-badge" title="Core charge applies"><i class="fas fa-exclamation-circle"></i> Core Item</div>` : ''}
-                            <div class="card-image">
-                                <img src="${r.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${esc(r.__pn)}">
-                            </div>
-                            <div class="card-content">
-                                <div class="part-number">${esc(r.__pn)}</div>
-                                <div class="brand-uom">${esc(r.brand || 'Unknown Brand')} | ${esc(r.uom || 'EA')}</div>
-                                <div class="description">${esc(r.description || 'No description available.')}</div>
-                                <div class="chips">
-                                    <span class="chip price">${fmtMoney(r.__price_num, r.currency)}</span>
-                                    <span class="chip ${stockClass}">${stockText}</span>
-                                    ${isCore ? `<span class="chip core">Core: ${fmtMoney(r.__core_num, r.currency)}</span>` : ''}
-                                </div>
-                                ${r.__alts.length ? `<div class="alt-pns"><strong>Alternate P/Ns:</strong> ${esc(r.__alts.join(', '))}</div>` : ''}
-                                <div class="quantity-control">
-                                    <span class="quantity-label">Quantity:</span>
-                                    <input type="number" class="quantity-input" value="${qty}" min="1" max="${inStock ? r.__stock_num : 999}" data-pn="${esc(r.__pn)}">
-                                </div>
-                                <div class="action-buttons">
-                                    <button class="action-btn cart-btn ${inCart ? 'go-to-cart' : ''}" data-pn="${esc(r.__pn)}" onclick="addToCart('${esc(r.__pn)}')">
-                                        <i class="fas ${inCart ? 'fa-shopping-cart' : 'fa-cart-plus'}"></i> ${inCart ? 'Go to Cart' : 'Add to Cart'}
-                                    </button>
-                                    <a href="https://wa.me/14706083818?text=Hi,%20I'm%20interested%20in%20part%20${encodeURIComponent(r.__pn)}" target="_blank" class="action-btn whatsapp-btn">
-                                        <i class="fab fa-whatsapp"></i> WhatsApp
-                                    </a>
-                                </div>
-                            </div>
+                return `
+                <div class="result-card">
+                    ${coreBadge}
+                    ${img}
+                    <div class="card-content">
+                        <div class="part-number">${r.__pn}</div>
+                        <div class="brand-uom">${r.brand || "No brand"} • ${r.uom || "Unit"}</div>
+                        <div class="description">${r.description || "No description available"}</div>
+                        <div class="chips">
+                            <span class="chip price">${price}</span>
+                            <span class="chip ${stockClass}">${stockStatus}</span>
+                            ${r.__core_num > 0 ? `<span class="chip core">Core ${fmtMoney(r.__core_num, r.currency)}</span>` : ""}
                         </div>
-                    `;
-                }).join("");
+                        ${alts}
+                        <div class="quantity-control">
+                            <span class="quantity-label">Qty:</span>
+                            <input type="number" min="1" value="1" class="quantity-input" id="qty-${r.__pn_norm}">
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="addToCart('${r.__pn_norm}')" class="action-btn cart-btn" ${inCart ? 'disabled style="opacity:.7;cursor:not-allowed;"' : ''}>
+                                <i class="fas ${cartButtonIcon}"></i> ${cartButtonText}
+                            </button>
+                            <a href="https://wa.me/14706083818?text=${encodeURIComponent('I want to order ' + r.__pn)}" class="action-btn whatsapp-btn" target="_blank" rel="noopener">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
             }
 
-            function addToCart(pn) {
-                const row = rows.find(r => r.__pn === pn);
-                if (!row) return;
+            function searchAndRender(query) {
+    const q = (query || "").trim();
+    $results.innerHTML = "";
+    if (q.length < 2) { 
+        $status.innerHTML = '<i class="fas fa-info-circle"></i> Please type at least 2 characters to search.'; 
+        return; 
+    }
 
-                const qtyInput = document.querySelector(`.quantity-input[data-pn="${esc(pn)}"]`);
-                const qty = Math.max(1, parseInt(qtyInput?.value || 1));
+    const qNorm = norm(q); // e.g., "4955354"
+    let matches = [];
 
-                const existingIndex = cart.findIndex(x => x.__pn === pn);
-                if (existingIndex >= 0) {
-                    // If already in cart, scroll to cart instead of adding again
-                    scrollToCart();
+    // Helpers
+    const uniqByPn = (arr) => {
+        const seen = new Set();
+        const out = [];
+        for (const r of arr) {
+            if (!seen.has(r.__pn_norm)) {
+                seen.add(r.__pn_norm);
+                out.push(r);
+            }
+        }
+        return out;
+    };
+    const maybeFilterInStock = (arr) => $instock.checked ? arr.filter(r => r.__stock_num > 0) : arr;
+
+    // Precompute sets
+    const exactEq = rows.filter(r => r.__pn_norm === qNorm); // full equality
+    const pnSuffix = rows.filter(r => r.__pn_norm.endsWith(qNorm)); // ends-with match
+    const altSuffix = $alt.checked
+        ? rows.filter(r => r.__alts_norm && r.__alts_norm.some(a => a.endsWith(qNorm)))
+        : [];
+
+    const fuzzy = fuse.search(q).map(x => x.item);
+
+    if ($exact.checked) {
+        // Exact mode now means "exact OR suffix-exact" (PN ends with query),
+        // plus suffix matches in alternate numbers if Include Alt is on.
+        // Order: exact equality first, then PN suffix, then ALT suffix.
+        const ordered = uniqByPn([...exactEq, ...pnSuffix, ...altSuffix]);
+
+        let out = maybeFilterInStock(ordered);
+        if (!out.length) {
+            $status.innerHTML = '<i class="fas fa-search"></i> No exact or suffix matches found. Try turning off "Exact Match" or adjust your query.';
+            return;
+        }
+
+        // Status text
+        const exactCount = exactEq.length;
+        const suffixCount = out.length - exactCount;
+        const partsWord = out.length === 1 ? "part" : "parts";
+        $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${out.length} ${partsWord} for "${q}" (${exactCount} exact, ${suffixCount} suffix)`;
+        $results.innerHTML = out.map(renderCard).join("");
+        return;
+    }
+
+    // Non-exact mode (original behavior): fuzzy first, then exact and alts, de-duped
+    const combined = uniqByPn([...fuzzy, ...exactEq, ...pnSuffix, ...altSuffix]);
+    const out = maybeFilterInStock(combined);
+
+    if (!out.length) { 
+        $status.innerHTML = '<i class="fas fa-search"></i> No matching parts found. Try a different part number or adjust your filters.'; 
+        return; 
+    }
+
+    $status.innerHTML = `<i class="fas fa-search"></i> Found ${out.length} part(s) matching "${q}"`;
+    $results.innerHTML = out.map(renderCard).join("");
+}
+
+            // Expose some functions to window for onclick handlers
+            window.addToCart = function(partNorm) {
+                if (cart.some(cartItem => cartItem.__pn_norm === partNorm)) {
+                    alert('This item is already in your cart.');
                     return;
                 }
+                const item = rows.find(r => r.__pn_norm === partNorm);
+                if (!item) return;
+                const quantity = parseInt(document.getElementById(`qty-${partNorm}`).value) || 1;
 
-                cart.push({ ...row, qty });
+                cart.push({
+                    ...item,
+                    quantity,
+                    totalPrice: (Number(item.__price_num) || 0) * quantity,
+                    coreIncluded: (Number(item.__core_num) || 0) > 0
+                });
+
                 updateCart();
-                renderResults(rows.filter(r => document.querySelector(`.result-card[data-pn="${esc(r.__pn)}"]`)));
-            }
+                searchAndRender($in.value);
 
-            function removeFromCart(pn) {
-                cart = cart.filter(x => x.__pn !== pn);
+// Update the button to "Go to Cart"
+const btn = document.querySelector(`button[onclick="addToCart('${partNorm}')"]`);
+if (btn) {
+    btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Go to Cart';
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.onclick = function() {
+        toggleCart();
+        document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' });
+    };
+}
+
+
+                // Success toast
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed; bottom: 20px; right: 20px; background: #38a169; color: white;
+                    padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+                    z-index: 1000; animation: fadeIn .3s ease-out;`;
+                notification.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 2000);
+            };
+
+            window.removeFromCart = function(partNorm) {
+                cart = cart.filter(item => item.__pn_norm !== partNorm);
                 updateCart();
-                renderResults(rows.filter(r => document.querySelector(`.result-card[data-pn="${esc(r.__pn)}"]`)));
-            }
+            };
 
-            function updateCartQuantities() {
-                document.querySelectorAll('.cart-item input').forEach(input => {
-                    const pn = input.getAttribute('data-pn');
-                    const qty = parseInt(input.value);
-                    if (qty > 0) {
-                        const item = cart.find(x => x.__pn === pn);
-                        if (item) item.qty = qty;
+            window.toggleCartItemCore = function(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const section = el.closest('.cart-item').querySelector('.cart-item-core');
+                const icon = el.querySelector('i');
+                const open = section.style.display === 'block';
+                section.style.display = open ? 'none' : 'block';
+                icon.classList.toggle('open', !open);
+            };
+
+            window.toggleCart = function() {
+                const isOpen = $cartContent.style.display === 'block';
+                $cartContent.style.display = isOpen ? 'none' : 'block';
+                const btn = document.querySelector('.cart-toggle');
+                btn.innerHTML = isOpen ? '<i class="fas fa-eye"></i> Show Cart' : '<i class="fas fa-eye-slash"></i> Hide Cart';
+            };
+
+            window.updateCartQuantities = function() {
+                const qtyInputs = document.querySelectorAll('.cart-qty-input');
+                qtyInputs.forEach(inp => {
+                    const normId = inp.dataset.norm;
+                    const qty = Math.max(1, parseInt(inp.value) || 1);
+                    const idx = cart.findIndex(x => x.__pn_norm === normId);
+                    if (idx >= 0) {
+                        cart[idx].quantity = qty;
+                        cart[idx].totalPrice = (Number(cart[idx].__price_num) || 0) * qty;
                     }
                 });
                 updateCart();
-            }
+            };
 
             function updateCart() {
-                localStorage.setItem('lf_cart', JSON.stringify(cart));
-
-                $cartCount.textContent = cart.length;
-                $cartCount.style.display = cart.length ? 'flex' : 'none';
-
-                const hasCore = cart.some(x => x.__core_num > 0);
-                $coreBadgeHeader.style.display = hasCore ? 'flex' : 'none';
-
                 if (!cart.length) {
-                    $cartItems.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br> Your cart is empty</div>';
-                    $cartTotal.textContent = "Total: $0.00";
+                    $cartItems.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br> Your cart is empty</div>`;
+                    $cartTotal.textContent = 'Total: $0.00';
+                    $cartCount.textContent = '0';
+                    $coreBadgeHeader.style.display = 'none';
                     return;
                 }
 
-                let total = 0;
-                let html = '';
+                let subtotal = 0;
+                let coreTotal = 0;
+                const itemsHtml = cart.map(item => {
+                    const line = (Number(item.__price_num) || 0) * item.quantity;
+                    subtotal += line;
+                    if (Number(item.__core_num) > 0) coreTotal += Number(item.__core_num) * item.quantity;
 
-                cart.forEach(item => {
-                    const itemTotal = item.__price_num * item.qty;
-                    total += itemTotal;
-                    const isCore = item.__core_num > 0;
-
-                    html += `
-                        <div class="cart-item">
-                            <div class="cart-item-main" onclick="toggleCartItem(this)">
-                                <div class="cart-item-details">
-                                    <div class="cart-item-name">
-                                        ${esc(item.__pn)}
-                                        ${isCore ? `<span class="cart-item-core-badge"><i class="fas fa-exclamation-circle"></i> Core</span>` : ''}
-                                    </div>
-                                    <div class="cart-item-price">
-                                        ${fmtMoney(item.__price_num, item.currency)} × 
-                                        <input type="number" class="quantity-input" value="${item.qty}" min="1" data-pn="${esc(item.__pn)}" style="width:60px; display:inline-block;"> = 
-                                        ${fmtMoney(itemTotal, item.currency)}
-                                    </div>
+                    const hasCore = Number(item.__core_num) > 0;
+                    const coreRow = hasCore ? `
+                        <div class="cart-item-core">
+                            <div class="cart-item-core-content">
+                                <div class="cart-item-core-info">
+                                    <div class="cart-item-core-name">Core Charge</div>
+                                    <div class="cart-item-core-desc">Core charges are refundable upon return of the used part per supplier policy.</div>
                                 </div>
-                                <div class="cart-item-expand"><i class="fas fa-chevron-down"></i></div>
+                                <div><strong>${fmtMoney(item.__core_num, item.currency)}</strong> x ${item.quantity}</div>
                             </div>
-                            ${isCore ? `
-                                <div class="cart-item-core">
-                                    <div class="cart-item-core-content">
-                                        <div class="cart-item-core-info">
-                                            <div class="cart-item-core-name">Core Charge: ${fmtMoney(item.__core_num, item.currency)}</div>
-                                            <div class="cart-item-core-desc">This part requires a core return for refund</div>
-                                        </div>
-                                        <button class="cart-item-remove" onclick="removeFromCart('${esc(item.__pn)}')"><i class="fas fa-trash"></i> Remove</button>
-                                    </div>
+                        </div>` : '';
+
+                    return `
+                    <div class="cart-item">
+                        <div class="cart-item-main" onclick="toggleCartItemCore('exp-${item.__pn_norm}')">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">
+                                    ${item.__pn}
+                                    ${hasCore ? '<span class="cart-item-core-badge">Core</span>' : ''}
                                 </div>
-                            ` : `
-                                <div class="cart-item-core">
-                                    <div class="cart-item-core-content">
-                                        <div class="cart-item-core-info">
-                                            <div class="cart-item-core-name">No core charge</div>
-                                        </div>
-                                        <button class="cart-item-remove" onclick="removeFromCart('${esc(item.__pn)}')"><i class="fas fa-trash"></i> Remove</button>
-                                    </div>
+                                <div class="cart-item-price">${fmtMoney(item.__price_num, item.currency)} x 
+                                    <input type="number" min="1" value="${item.quantity}" class="quantity-input cart-qty-input" data-norm="${item.__pn_norm}" style="width:70px; margin-left:6px;">
                                 </div>
-                            `}
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div><strong>${fmtMoney(line, item.currency)}</strong></div>
+                                ${hasCore ? `<div id="exp-${item.__pn_norm}" class="cart-item-expand"><i class="fas fa-chevron-down"></i></div>` : ''}
+                                <button class="cart-item-remove" onclick="event.stopPropagation(); removeFromCart('${item.__pn_norm}')"><i class="fas fa-trash-alt"></i> Remove</button>
+                            </div>
                         </div>
-                    `;
-                });
+                        ${coreRow}
+                    </div>`;
+                }).join("");
 
-                $cartItems.innerHTML = html;
-                $cartTotal.textContent = `Total: ${fmtMoney(total, CURRENCY_FALLBACK)}`;
+                const estTotal = subtotal + coreTotal;
+                $cartItems.innerHTML = itemsHtml;
+                $cartTotal.innerHTML = `
+                    <div><span style="opacity:.8;">Subtotal:</span> ${fmtMoney(subtotal)}</div>
+                    <div><span style="opacity:.8;">Core Charges:</span> ${fmtMoney(coreTotal)}</div>
+                    <div style="margin-top:6px;">Est. Total: <strong>${fmtMoney(estTotal)}</strong></div>`;
+                $cartCount.textContent = String(cart.reduce((a, b) => a + (b.quantity || 0), 0));
+                $coreBadgeHeader.style.display = cart.some(x => Number(x.__core_num) > 0) ? 'inline-block' : 'none';
             }
 
-            function toggleCartItem(el) {
-                const coreEl = el.nextElementSibling;
-                const expandEl = el.querySelector('.cart-item-expand i');
-                
-                if (coreEl.style.display === 'block') {
-                    coreEl.style.display = 'none';
-                    expandEl.className = 'fas fa-chevron-down';
-                } else {
-                    coreEl.style.display = 'block';
-                    expandEl.className = 'fas fa-chevron-up';
-                }
+			// Payment notes (FIX #4: use $0.30 instead of colón symbol)
+			function updatePaymentNote() {
+			  const v = $paymentMethod.value;
+			  let text = '';
+			  if (v === 'credit_card') text = 'Card payments incur +3.5% + $0.30 processing. You’ll receive a secure payment link.';
+			  else if (v === 'paypal') text = 'PayPal payments incur +3.9% + $0.30 processing. We’ll send a PayPal link.';
+			  else if (v === 'bank_wire') text = 'Bank wire transfers incur a $25 bank fee. We’ll email you our banking details.';
+			  else if (v === 'zelle') text = 'No processing fee. We’ll email the Zelle instructions.';
+			  else if (v === 'ach') text = 'No processing fee. We’ll email the ACH instructions.';
+			  $paymentNote.textContent = text;
             }
+            $paymentMethod.addEventListener('change', updatePaymentNote);
 
-            function toggleCart() {
-                if ($cartContent.style.display === 'block') {
-                    $cartContent.style.display = 'none';
-                    document.querySelector('.cart-toggle').innerHTML = '<i class="fas fa-eye"></i> Show Cart';
-                } else {
-                    $cartContent.style.display = 'block';
-                    document.querySelector('.cart-toggle').innerHTML = '<i class="fas fa-eye-slash"></i> Hide Cart';
-                }
-            }
+    // Checkout via mailto (includes customer info)
+    window.checkout = function() {
+      if (!cart.length) {
+        alert('Your cart is empty.');
+        return;
+      }
+      const pay = $paymentMethod.value;
+      if (!pay) {
+        alert('Please select a payment method.');
+        return;
+      }
+      if (!validateCustomerInfo()) {
+        alert('Please correct the highlighted customer fields.');
+        return;
+      }
+      const cust = saveCustomerInfo(); // persist
 
-            function checkout() {
-                if (!cart.length) {
-                    alert("Your cart is empty. Add some parts before checking out.");
-                    return;
-                }
+      const payMap = {
+        credit_card: 'Credit Card (+3.5% + $0.30)',
+        paypal: 'PayPal (+3.9% + $0.30)',
+        bank_wire: 'Bank Wire (+$25)',
+        zelle: 'Zelle (+$0.0)',
+        ach: 'ACH (+$0.0)'
+      };
 
-                if (!validateCustomerInfo()) {
-                    alert("Please fill in all required customer information fields correctly.");
-                    return;
-                }
+      let lines = cart.map(it => {
+        const price = fmtMoney(it.__price_num, it.currency);
+        const core = Number(it.__core_num) > 0 ? ` | Core: ${fmtMoney(it.__core_num, it.currency)} x ${it.quantity}` : '';
+        return `• ${it.__pn} | Qty: ${it.quantity} | Unit: ${price}${core}`;
+      }).join('%0A');
 
-                const customerInfo = saveCustomerInfo();
-                const paymentMethod = $paymentMethod.value;
-                if (!paymentMethod) {
-                    alert("Please select a payment method.");
-                    return;
-                }
+      let subtotal = cart.reduce((s, it) => s + (Number(it.__price_num)||0) * it.quantity, 0);
+      let cores = cart.reduce((s, it) => s + (Number(it.__core_num)||0) * it.quantity, 0);
+      const estTotal = subtotal + cores;
 
-                // Build email body
-                let emailBody = "New Parts Order from Limitless LLC Part Finder\n\n";
-                emailBody += "=== CUSTOMER INFORMATION ===\n";
-                emailBody += `Name: ${customerInfo.name}\n`;
-                emailBody += `Email: ${customerInfo.email}\n`;
-                emailBody += `Phone: ${customerInfo.phone}\n`;
-                if (customerInfo.company) emailBody += `Company: ${customerInfo.company}\n`;
-                emailBody += `Address: ${customerInfo.address1}\n`;
-                if (customerInfo.address2) emailBody += `Address 2: ${customerInfo.address2}\n`;
-                emailBody += `City: ${customerInfo.city}\n`;
-                emailBody += `State/Region: ${customerInfo.state}\n`;
-                emailBody += `ZIP/Postal: ${customerInfo.zip}\n`;
-                emailBody += `Country: ${customerInfo.country}\n`;
-                if (customerInfo.instructions) emailBody += `Special Instructions: ${customerInfo.instructions}\n`;
+      const subject = encodeURIComponent('New Parts Order Request - Limitless Website');
+      const customerBlock =
+`Customer Details:
+• Name: ${cust.name}
+• Company: ${cust.company || '-'}
+• Email: ${cust.email}
+• Phone: ${cust.phone}
 
-                emailBody += "\n=== ORDER DETAILS ===\n";
-                let total = 0;
-                cart.forEach(item => {
-                    const itemTotal = item.__price_num * item.qty;
-                    total += itemTotal;
-                    emailBody += `${item.__pn} - ${item.qty} × ${fmtMoney(item.__price_num, item.currency)} = ${fmtMoney(itemTotal, item.currency)}\n`;
-                    if (item.__core_num > 0) {
-                        emailBody += `  Core Charge: ${fmtMoney(item.__core_num, item.currency)} (refundable upon core return)\n`;
-                    }
-                });
-                emailBody += `\nTOTAL: ${fmtMoney(total, CURRENCY_FALLBACK)}\n`;
+Ship-To:
+• ${cust.address1}${cust.address2 ? ', ' + cust.address2 : ''}
+• ${cust.city}, ${cust.state} ${cust.zip}
+• ${cust.country}
 
-                emailBody += "\n=== PAYMENT METHOD ===\n";
-                emailBody += `Selected: ${$paymentMethod.options[$paymentMethod.selectedIndex].text}\n`;
+Notes:
+${cust.instructions || '-'}`;
 
-                // Encode for mailto
-                const subject = "New Parts Order from Website";
-                const mailtoLink = `mailto:orders@limitless-llc.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      const body = encodeURIComponent(
+`Customer indicates they are ready to order.
 
-                // Open email client
-                window.location.href = mailtoLink;
+Items:
+${decodeURIComponent(lines)}
 
-                // Show confirmation
-                alert("Your order details have been prepared. Please review and send the email that just opened to complete your order.");
-            }
+Subtotal: ${fmtMoney(subtotal)}
+Core Charges: ${fmtMoney(cores)}
+Est. Total: ${fmtMoney(estTotal)}
 
-            // Load cart from localStorage
-            try {
-                const savedCart = localStorage.getItem('lf_cart');
-                if (savedCart) {
-                    cart = JSON.parse(savedCart);
-                    updateCart();
-                }
-            } catch (e) {
-                console.error("Error loading cart:", e);
-            }
+Selected Payment Method: ${payMap[pay]}
 
-            // Payment method change handler
-            $paymentMethod.addEventListener('change', function() {
-                const notes = {
-                    'credit_card': 'You will receive a secure payment link to pay by credit card.',
-                    'paypal': 'You will receive an invoice that can be paid via PayPal.',
-                    'bank_wire': 'We will email you our bank details for wire transfer.',
-                    'zelle': 'We will email you our Zelle payment information.',
-                    'ach': 'We will email you our bank details for ACH transfer (U.S. only).'
-                };
-                $paymentNote.textContent = notes[this.value] || '';
-            });
+${customerBlock}
 
-            // Event listeners
-            $go.addEventListener('click', search);
-            $in.addEventListener('keypress', e => { if (e.key === 'Enter') search(); });
-            $exact.addEventListener('change', search);
-            $alt.addEventListener('change', search);
-            $instock.addEventListener('change', search);
+- Shipping & Handling will be calculated based on final weight, dimensions, and destination.
+- Please confirm availability and lead time before sending payment link.
 
-            // Initial render if there are items in cart
-            if (cart.length) {
-                renderResults(rows.filter(r => document.querySelector(`.result-card[data-pn="${esc(r.__pn)}"]`)));
-            }
-        })();
-    </script>
+(Automatically generated from Find Parts page)`
+      );
+
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position:fixed; bottom:20px; right:20px; background:#3182ce; color:#fff;
+        padding:12px 16px; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,.2); z-index:1000;`;
+      toast.innerHTML = `<i class="fas fa-envelope"></i> Preparing email…`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+
+      window.parent.location.href = `mailto:info@limitless-llc.us?subject=${subject}&body=${body}`;
+    };
+
+    // Listeners
+    $go.addEventListener('click', () => searchAndRender($in.value));
+    $in.addEventListener('keydown', (e) => { if (e.key === 'Enter') searchAndRender($in.value); });
+    [$exact, $alt, $instock].forEach(el => el.addEventListener('change', () => searchAndRender($in.value)));
+
+    // Initial hint (FIX #5: only show if we did not already display "loaded")
+    if (!$status.dataset.loaded) {
+      $status.innerHTML = '<i class="fas fa-info-circle"></i> Type a part number (e.g., 3802010) or keyword to begin.';
+    }
+  })();
+  </script>
+</body>
+</html>
+
 </body>
 </html>
