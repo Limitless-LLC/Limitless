@@ -490,8 +490,12 @@
                 const alt = (r.alt_pns || "").toString().split(/[;,]/).map(s=>s.trim()).filter(Boolean);
                 const alts = alt.length ? `<div class="alt-pns"><strong>Alternate Part Numbers:</strong> ${alt.join(", ")}</div>` : "";
                 const inCart = cart.some(item => item.__pn_norm === r.__pn_norm);
-                const cartButtonText = inCart ? "Added to Cart" : "Add to Cart";
-                const cartButtonIcon = inCart ? "fa-check" : "fa-cart-plus";
+const cartButtonText = inCart ? "Go to Cart" : "Add to Cart";
+const cartButtonIcon = inCart ? "fa-shopping-cart" : "fa-cart-plus";
+const cartButtonAction = inCart
+    ? `onclick="toggleCart(); document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' })"`
+    : `onclick="addToCart('${r.__pn_norm}')"`
+
                 const coreBadge = r.__core_num > 0 ? `
                     <div class="core-badge" title="Core Charge: ${fmtMoney(r.__core_num, r.currency)}. Refunded upon return of the used part per supplier policy.">
                         <i class="fas fa-exclamation-circle"></i> Core
@@ -516,9 +520,10 @@
                             <input type="number" min="1" value="1" class="quantity-input" id="qty-${r.__pn_norm}">
                         </div>
                         <div class="action-buttons">
-                            <button onclick="addToCart('${r.__pn_norm}')" class="action-btn cart-btn" ${inCart ? 'disabled style="opacity:.7;cursor:not-allowed;"' : ''}>
-                                <i class="fas ${cartButtonIcon}"></i> ${cartButtonText}
-                            </button>
+                            <button ${cartButtonAction} class="action-btn cart-btn">
+    <i class="fas ${cartButtonIcon}"></i> ${cartButtonText}
+</button>
+
                             <a href="https://wa.me/14706083818?text=${encodeURIComponent('I want to order ' + r.__pn)}" class="action-btn whatsapp-btn" target="_blank" rel="noopener">
                                 <i class="fab fa-whatsapp"></i> WhatsApp
                             </a>
