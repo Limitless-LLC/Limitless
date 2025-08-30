@@ -1,361 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Cart - Limitless LLC</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * { box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { margin:0; background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%); color:#2d3748; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-    .header { background:linear-gradient(120deg,#2c3e50 0%,#3498db 100%); color:#fff; border-radius:16px; padding:24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; }
-    .header h1 { margin:0; font-size:1.8rem; }
-    .back { color:#fff; text-decoration:none; font-weight:600; }
-    .card { background:#fff; border-radius:16px; box-shadow:0 5px 20px rgba(0,0,0,.08); padding:20px; margin-bottom:20px; }
-    .cart-item { display:flex; justify-content:space-between; align-items:flex-start; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:12px; background:#f9fafb; }
-    .cart-item h4 { margin:0 0 6px 0; font-size:16px; color:#2c3e50; }
-    .desc { font-size:13px; color:#4a5568; margin-bottom:6px; }
-    .row-right { display:flex; gap:12px; align-items:center; }
-    .qty { width:70px; padding:8px 10px; border:1px solid #ddd; border-radius:8px; text-align:center; }
-    .remove { background:none; border:none; color:#e53e3e; cursor:pointer; padding:8px 10px; border-radius:8px; }
-    .remove:hover { background:#fed7d7; }
-    .totals { text-align:right; font-weight:700; padding-top:8px; border-top:2px solid #e2e8f0; }
-    .section-title { font-weight:700; font-size:18px; margin-bottom:10px; color:#2c3e50; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:14px; }
-    .label { display:block; font-weight:600; margin-bottom:6px; color:#4a5568; }
-    .input, .select, .textarea { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; }
-    .textarea { min-height:80px; resize:vertical; }
-    .required::after { content:" *"; color:#e53e3e; }
-    .checkout { padding:16px; background:linear-gradient(120deg, #38a169 0%, #48bb78 100%); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer; width:100%; display:flex; align-items:center; justify-content:center; gap:10px; }
-    .muted { font-size:12px; color:#718096; }
-    @media (max-width:600px){ .row-right{ flex-direction:column; align-items:flex-end; } }
-  </style>
+<meta charset="utf-8"/>
+<title>Cart - Part Finder</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #2d3748; line-height: 1.6; min-height: 100vh; padding: 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 30px; padding: 30px 20px; background: linear-gradient(120deg, #2c3e50 0%, #3498db 100%); color: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.15); position: relative; }
+        .header h1 { font-size: 2.8rem; margin-bottom: 10px; font-weight: 700; }
+        .header p { font-size: 1.2rem; opacity: .9; max-width: 700px; margin: 0 auto; }
+        .cart-icon-header { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: white; display: flex; align-items: center; gap: 8px; }
+        .cart-count { background: #e74c3c; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+        .core-badge-header { position: absolute; top: 50px; right: 20px; background: #f39c12; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; display: none; }
+
+        /* Navigation */
+        .nav-back { margin-bottom: 20px; }
+        .back-btn { padding: 12px 24px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: .3s; text-decoration: none; }
+        .back-btn:hover { background: #1a202c; }
+
+        /* Cart */
+        .cart-content { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,.08); }
+        .cart-items { margin-bottom: 25px; }
+        .cart-item { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+        .cart-item-main { display: flex; justify-content: space-between; padding: 18px; align-items: center; background: #f8f9fa; cursor: pointer; }
+        .cart-item-details { flex: 1; }
+        .cart-item-name { font-weight: 600; margin-bottom: 6px; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
+        .cart-item-core-badge { background: #f39c12; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .cart-item-price { color: #718096; font-size: 14px; }
+        .cart-item-expand { color: #718096; font-size: 14px; transition: .3s; }
+        .cart-item-expand.open { transform: rotate(180deg); }
+        .cart-item-core { padding: 15px; background: #fff5f5; border-top: 1px solid #fed7d7; display: none; }
+        .cart-item-core-content { display: flex; justify-content: space-between; align-items: center; }
+        .cart-item-core-info { flex: 1; }
+        .cart-item-core-name { font-weight: 500; margin-bottom: 4px; color: #c53030; }
+        .cart-item-core-desc { color: #e53e3e; font-size: 13px; }
+        .cart-item-remove { color: #e53e3e; background: none; border: none; cursor: pointer; padding: 8px 16px; font-size: 14px; border-radius: 6px; transition: .3s; }
+        .cart-item-remove:hover { background: #fed7d7; }
+        .cart-total { font-weight: 700; text-align: right; padding: 20px 0; border-top: 2px solid #e2e8f0; font-size: 20px; color: #2c3e50; }
+        .empty-cart { color: #a0aec0; font-style: italic; text-align: center; padding: 40px; font-size: 16px; }
+
+        /* Update Cart Button */
+        .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
+        .update-cart-btn:hover { background: #1a202c; }
+
+        /* Customer Information Section */
+        .customer-info-section { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .customer-info-title { font-size: 20px; color: #2c3e50; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+        .customer-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #4a5568; }
+        .form-input, .form-textarea, .form-select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color .3s; }
+        .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: #3498db; outline: none; box-shadow: 0 0 0 3px rgba(52,152,219,.2); }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-required::after { content: "*"; color: #e53e3e; margin-left: 4px; }
+        .form-error { color: #e53e3e; font-size: 14px; margin-top: 5px; display: none; }
+        .invalid { border-color: #e53e3e !important; box-shadow: 0 0 0 3px rgba(229,62,62,.15) !important; }
+
+        /* Checkout box */
+        .checkout-section { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .checkout-title { font-size: 20px; color: #2c3e50; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+        .checkout-instructions { margin-bottom: 20px; line-height: 1.5; }
+        .payment-method { margin-bottom: 20px; }
+        .payment-label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .payment-select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 8px; }
+        .payment-note { font-size: 14px; color: #4a5568; margin-bottom: 15px; padding: 10px; background: #edf2f7; border-radius: 6px; }
+        .shipping-note { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
+        .compliance-notes { font-size: 12px; color: #718096; margin-bottom: 20px; }
+        .compliance-note { margin-bottom: 5px; }
+        .checkout-btn { padding: 18px; background: linear-gradient(120deg, #38a169 0%, #48bb78 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; width: 100%; transition: .3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(72,187,120,.3); }
+        .checkout-helper { font-size: 12px; color: #718096; text-align: center; margin-top: 10px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.2rem; }
+            .header p { font-size: 1rem; }
+            .cart-item-main { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .cart-icon-header { position: relative; top: 0; right: 0; margin-top: 15px; justify-content: center; }
+            .core-badge-header { position: relative; top: 0; right: 0; margin: 5px auto; width: fit-content; }
+            .customer-form { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1><i class="fas fa-shopping-cart"></i> Cart</h1>
-      <a class="back" href="index.html"><i class="fas fa-arrow-left"></i> Back to Finder</a>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Your Items</div>
-      <div id="items"></div>
-      <div class="totals" id="totals"></div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Customer Information</div>
-      <div class="grid">
-        <div>
-          <label class="label required" for="email">Email Address</label>
-          <input id="email" type="email" class="input" placeholder="your.email@example.com">
-        </div>
-        <div>
-          <label class="label required" for="phone">Phone Number</label>
-          <input id="phone" type="tel" class="input" placeholder="+1 470 608 3818">
-        </div>
-        <div>
-          <label class="label" for="company">Company Name</label>
-          <input id="company" type="text" class="input" placeholder="Your Company">
-        </div>
-        <div>
-          <label class="label required" for="name">Full Name</label>
-          <input id="name" type="text" class="input" placeholder="First and Last Name">
-        </div>
-        <div>
-          <label class="label required" for="address1">Address Line 1</label>
-          <input id="address1" type="text" class="input" placeholder="Street address, P.O. box">
-        </div>
-        <div>
-          <label class="label" for="address2">Address Line 2</label>
-          <input id="address2" type="text" class="input" placeholder="Apt, suite, unit, etc.">
-        </div>
-        <div>
-          <label class="label required" for="city">City</label>
-          <input id="city" type="text" class="input" placeholder="City">
-        </div>
-        <div>
-          <label class="label required" for="state">State/Province/Region</label>
-          <input id="state" type="text" class="input" placeholder="State / Province / Region">
-        </div>
-        <div>
-          <label class="label required" for="zip">ZIP/Postal Code</label>
-          <input id="zip" type="text" class="input" placeholder="ZIP / Postal code">
-        </div>
-        <div>
-          <label class="label required" for="country">Country</label>
-          <select id="country" class="select">
-            <option value="">Select Country</option>
-            <option value="US" selected>United States</option>
-            <option value="CA">Canada</option>
-            <option value="MX">Mexico</option>
-            <option value="AU">Australia</option>
-            <option value="GB">United Kingdom</option>
-            <option value="DE">Germany</option>
-            <option value="FR">France</option>
-            <option value="OTHER">Other</option>
-          </select>
-        </div>
-
-        <!-- NEW optional engine fields -->
-        <div>
-          <label class="label" for="engineModel">Engine Model (optional)</label>
-          <input id="engineModel" type="text" class="input" placeholder="e.g., Cummins ISX, CAT 3406">
-        </div>
-        <div>
-          <label class="label" for="engineSerial">Engine Serial Number (optional)</label>
-          <input id="engineSerial" type="text" class="input" placeholder="ESN / S/N">
-        </div>
-
-        <div style="grid-column:1 / -1;">
-          <label class="label" for="instructions">Special Instructions</label>
-          <textarea id="instructions" class="textarea" placeholder="Any shipping notes or info about your order"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Payment Preference</div>
-      <div class="grid">
-        <div>
-          <label class="label" for="pay">Choose payment method</label>
-          <select id="pay" class="select">
-            <option value="">Select a payment method</option>
-            <option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
-            <option value="paypal">PayPal</option>
-            <option value="bank_wire">Bank Wire</option>
-            <option value="zelle">Zelle</option>
-            <option value="ach">ACH (U.S. only)</option>
-          </select>
-        </div>
-        <div>
-          <div id="paynote" class="muted"></div>
-        </div>
-      </div>
-      <p class="muted" style="margin-top:8px;">
-        Shipping &amp; Handling will be calculated after we confirm weight, dimensions, and destination.
-      </p>
-      <button class="checkout" id="checkout"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
-      <div class="muted" style="margin-top:8px;">This emails your order details to Limitless; you’ll receive a confirmation and payment link.</div>
-    </div>
-  </div>
-
-  <script>
-    const $items = document.getElementById('items');
-    const $totals = document.getElementById('totals');
-    const $checkout = document.getElementById('checkout');
-    const $pay = document.getElementById('pay');
-    const $paynote = document.getElementById('paynote');
-
-    // Customer fields
-    const $email = document.getElementById('email');
-    const $phone = document.getElementById('phone');
-    const $company = document.getElementById('company');
-    const $name = document.getElementById('name');
-    const $address1 = document.getElementById('address1');
-    const $address2 = document.getElementById('address2');
-    const $city = document.getElementById('city');
-    const $state = document.getElementById('state');
-    const $zip = document.getElementById('zip');
-    const $country = document.getElementById('country');
-    const $instructions = document.getElementById('instructions');
-    const $engineModel = document.getElementById('engineModel');
-    const $engineSerial = document.getElementById('engineSerial');
-
-    // helpers
-    const fmtMoney = (n, cur='USD') => cur + ' ' + (Number(n)||0).toFixed(2);
-    const payMap = {
-      credit_card: 'Credit Card (+3.5% + $0.30)',
-      paypal: 'PayPal (+3.9% + $0.30)',
-      bank_wire: 'Bank Wire (+$25)',
-      zelle: 'Zelle (+$0.0)',
-      ach: 'ACH (+$0.0)'
-    };
-    function setPayNote() {
-      const v = $pay.value;
-      $paynote.textContent = v ? ({
-        credit_card: 'Card payments incur +3.5% + $0.30 processing.',
-        paypal: 'PayPal payments incur +3.9% + $0.30 processing.',
-        bank_wire: 'Bank wire transfers incur a $25 bank fee.',
-        zelle: 'No processing fee.',
-        ach: 'No processing fee.',
-      }[v] || '') : '';
-    }
-    $pay.addEventListener('change', setPayNote);
-
-    function loadCart() {
-      try {
-        return JSON.parse(localStorage.getItem('lf_cart') || '[]');
-      } catch(e) { return []; }
-    }
-    function saveCart(cart) {
-      try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
-    }
-
-    let cart = loadCart();
-
-    function render() {
-      if (!cart.length) {
-        $items.innerHTML = '<div class="muted">Your cart is empty.</div>';
-        $totals.innerHTML = '';
-        return;
-      }
-      let subtotal=0, coreTotal=0;
-      $items.innerHTML = cart.map(it => {
-        const line = (Number(it.__price_num)||0) * (it.quantity||1);
-        subtotal += line;
-        if (Number(it.__core_num) > 0) coreTotal += Number(it.__core_num) * (it.quantity||1);
-        return `
-          <div class="cart-item">
-            <div>
-              <h4>${it.__pn}</h4>
-              <div class="desc">${it.description || 'No description available'}</div>
-              <div class="muted">${fmtMoney(it.__price_num, it.currency)} each${Number(it.__core_num)>0?` • Core ${fmtMoney(it.__core_num, it.currency)}`:''}</div>
-            </div>
-            <div class="row-right">
-              <input class="qty" type="number" min="1" value="${it.quantity||1}" data-pn="${it.__pn_norm}">
-              <div><strong>${fmtMoney(line, it.currency)}</strong></div>
-              <button class="remove" data-remove="${it.__pn_norm}"><i class="fas fa-trash-alt"></i> Remove</button>
-            </div>
+<div class="container">
+<div class="header">
+<h1><i class="fas fa-shopping-cart"></i> Your Cart</h1>
+<p>Review your items and proceed to checkout</p>
+<div class="cart-icon-header" onclick="goHomePage()">
+<i class="fas fa-home"></i> Back to Search
+</div>
+<div class="core-badge-header" id="core-badge-header">
+<i class="fas fa-exclamation-circle"></i> Core Items
+</div>
+</div>
+<div class="nav-back">
+<a class="back-btn" href="index.html"><i class="fas fa-arrow-left"></i> Back to Search</a>
+</div>
+<div class="cart-content">
+<button class="update-cart-btn" onclick="updateCartQuantities()"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
+<div class="cart-items" id="cart-items">
+<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>
+</div>
+<div class="cart-total" id="cart-total">Total: $0.00</div>
+<!-- Customer Information Section -->
+<div class="customer-info-section" id="customer-info-section">
+<div class="customer-info-title">Customer Information</div>
+<div class="customer-form">
+<div class="form-group">
+<label class="form-label form-required" for="customer-email">Email Address</label>
+<input class="form-input" id="customer-email" placeholder="your.email@example.com" type="email"/>
+<div class="form-error" id="email-error">Please enter a valid email address</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-phone">Phone Number</label>
+<input class="form-input" id="customer-phone" placeholder="+1 470 608 3818" type="tel"/>
+<div class="form-error" id="phone-error">Please enter a valid phone number</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="customer-company">Company Name</label>
+<input class="form-input" id="customer-company" placeholder="Your Company Name" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-name">Full Name</label>
+<input class="form-input" id="customer-name" placeholder="First and Last Name" type="text"/>
+<div class="form-error" id="name-error">Please enter your name</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-address1">Address Line 1</label>
+<input class="form-input" id="customer-address1" placeholder="Street address, P.O. box" type="text"/>
+<div class="form-error" id="address1-error">Please enter your address</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="customer-address2">Address Line 2</label>
+<input class="form-input" id="customer-address2" placeholder="Apartment, suite, unit, building, floor, etc." type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-city">City</label>
+<input class="form-input" id="customer-city" placeholder="City" type="text"/>
+<div class="form-error" id="city-error">Please enter your city</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-state">State/Province/Region</label>
+<input class="form-input" id="customer-state" placeholder="State / Province / Region" type="text"/>
+<div class="form-error" id="state-error">Please enter your state/province</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-zip">ZIP/Postal Code</label>
+<input class="form-input" id="customer-zip" placeholder="ZIP / Postal code" type="text"/>
+<div class="form-error" id="zip-error">Please enter your ZIP/postal code</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-country">Country</label>
+<select class="form-select" id="customer-country">
+<option value="">Select Country</option>
+<option selected="" value="US">United States</option>
+<option value="CA">Canada</option>
+<option value="MX">Mexico</option>
+<option value="AU">Australia</option>
+<option value="GB">United Kingdom</option>
+<option value="DE">Germany</option>
+<option value="FR">France</option>
+<option value="OTHER">Other</option>
+</select>
+<div class="form-error" id="country-error">Please select your country</div>
+</div>
+<div class="form-group" style="grid-column:1 / -1;">
+<label class="form-label" for="customer-instructions">Special Instructions</label>
+<textarea class="form-textarea" id="customer-instructions" placeholder="Any special shipping instructions or notes about your order"></textarea>
+</div>
+</div>
+</div>
+<div class="checkout-section">
+<div class="checkout-title">How Checkout Works</div>
+<div class="checkout-instructions">
+            The Proceed to Checkout button does not process payment—it sends your order details to Limitless so we can confirm availability, shipping, and send you a secure payment link.
           </div>
-        `;
-      }).join('');
-      const est = subtotal + coreTotal;
-      $totals.innerHTML = `
-        <div>Subtotal: ${fmtMoney(subtotal)}</div>
-        <div>Core Charges: ${fmtMoney(coreTotal)}</div>
-        <div style="margin-top:6px;">Est. Total: <strong>${fmtMoney(est)}</strong></div>
-      `;
+<div class="payment-method">
+<label class="payment-label" for="payment-method">Choose your preferred payment method:</label>
+<select class="payment-select" id="payment-method">
+<option value="">Select a payment method</option>
+<option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
+<option value="paypal">PayPal</option>
+<option value="bank_wire">Bank Wire</option>
+<option value="zelle">Zelle</option>
+<option value="ach">ACH (U.S. only)</option>
+</select>
+<div class="payment-note" id="payment-note"></div>
+</div>
+<div class="shipping-note">
+<strong>Shipping &amp; Handling:</strong> Calculated after we confirm weight, dimensions, and destination. You'll see the final S&amp;H on our reply email with your payment link.
+          </div>
+<div class="compliance-notes">
+<div class="compliance-note">• Stock &amp; Lead Time: Availability and lead times are confirmed by email before payment.</div>
+<div class="compliance-note">• Tax: Sales tax, if applicable, is shown on your final invoice (or buyer may owe use tax).</div>
+<div class="compliance-note">• International: Duties and import charges are paid by the consignee unless otherwise agreed.</div>
+</div>
+<button class="checkout-btn" onclick="checkout()"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
+<div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
+</div>
+</div>
+</div>
+<script>
+        const CURRENCY_FALLBACK = "USD";
+        const DECIMALS = 2;
 
-      // wire events
-      $items.querySelectorAll('.qty').forEach(inp => {
-        inp.addEventListener('change', e => {
-          const norm = e.target.dataset.pn;
-          const qty = Math.max(1, parseInt(e.target.value)||1);
-          const idx = cart.findIndex(x => x.__pn_norm === norm);
-          if (idx>=0) { cart[idx].quantity = qty; saveCart(cart); render(); }
+        const $cartItems = document.getElementById('cart-items');
+        const $cartTotal = document.getElementById('cart-total');
+        const $cartCount = document.getElementById('cart-count');
+        const $coreBadgeHeader = document.getElementById('core-badge-header');
+
+        const $paymentMethod = document.getElementById('payment-method');
+        const $paymentNote = document.getElementById('payment-note');
+
+        // Customer fields
+        const $customerEmail = document.getElementById('customer-email');
+        const $customerPhone = document.getElementById('customer-phone');
+        const $customerCompany = document.getElementById('customer-company');
+        const $customerName = document.getElementById('customer-name');
+        const $customerAddress1 = document.getElementById('customer-address1');
+        const $customerAddress2 = document.getElementById('customer-address2');
+        const $customerCity = document.getElementById('customer-city');
+        const $customerState = document.getElementById('customer-state');
+        const $customerZip = document.getElementById('customer-zip');
+        const $customerCountry = document.getElementById('customer-country');
+        const $customerInstructions = document.getElementById('customer-instructions');
+
+        let cart = [];
+        try {
+            const saved = localStorage.getItem('lf_cart');
+            if (saved) cart = JSON.parse(saved);
+        } catch (e) {
+            console.error('Could not load cart from storage:', e);
+        }
+
+        const fmtMoney = (num, cur) => {
+            const n = Number(num);
+            if (!isFinite(n)) return String(num || "");
+            return `${cur || CURRENCY_FALLBACK} ${n.toFixed(DECIMALS)}`;
+        };
+
+        const esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => 
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+        );
+
+        // Prefill from localStorage
+        (function prefill() {
+            try {
+                const raw = localStorage.getItem('lf_customer_info');
+                if (!raw) return;
+                const v = JSON.parse(raw);
+                $customerEmail.value = v.email || "";
+                $customerPhone.value = v.phone || "";
+                $customerCompany.value = v.company || "";
+                $customerName.value = v.name || ""
+                $customerAddress1.value = v.address1 || "";
+                $customerAddress2.value = v.address2 || "";
+                $customerCity.value = v.city || "";
+                $customerState.value = v.state || "";
+                $customerZip.value = v.zip || "";
+                $customerCountry.value = v.country || "US";
+                $customerInstructions.value = v.instructions || "";
+            } catch(e) { /* ignore */ }
+        })();
+
+        function saveCustomerInfo() {
+            const data = {
+                email: $customerEmail.value.trim(),
+                phone: $customerPhone.value.trim(),
+                company: $customerCompany.value.trim(),
+                name: $customerName.value.trim(),
+                address1: $customerAddress1.value.trim(),
+                address2: $customerAddress2.value.trim(),
+                city: $customerCity.value.trim(),
+                state: $customerState.value.trim(),
+                zip: $customerZip.value.trim(),
+                country: $customerCountry.value,
+                instructions: $customerInstructions.value.trim()
+            };
+            localStorage.setItem('lf_customer_info', JSON.stringify(data));
+            return data;
+        }
+
+        function showError(input, errorEl, show) {
+            if (!errorEl) return;
+            errorEl.style.display = show ? 'block' : 'none';
+            if (show) input.classList.add('invalid'); else input.classList.remove('invalid');
+        }
+
+        function validateCustomerInfo() {
+            let ok = true;
+
+            const email = $customerEmail.value.trim();
+            const phone = $customerPhone.value.trim();
+            const name = $customerName.value.trim();
+            const address1 = $customerAddress1.value.trim();
+            const city = $customerCity.value.trim();
+            const state = $customerState.value.trim();
+            const zip = $customerZip.value.trim();
+            const country = $customerCountry.value;
+
+            // basic patterns
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            const phoneOk = phone.length >= 6; // keep loose for international
+
+            showError($customerEmail, document.getElementById('email-error'), !emailOk);
+            showError($customerPhone, document.getElementById('phone-error'), !phoneOk);
+            showError($customerName, document.getElementById('name-error'), name === "");
+            showError($customerAddress1, document.getElementById('address1-error'), address1 === "");
+            showError($customerCity, document.getElementById('city-error'), city === "");
+            showError($customerState, document.getElementById('state-error'), state === "");
+            showError($customerZip, document.getElementById('zip-error'), zip === "");
+            showError($customerCountry, document.getElementById('country-error'), country === "");
+
+            if (!emailOk || !phoneOk || name === "" || address1 === "" || 
+                city === "" || state === "" || zip === "" || country === "") {
+                ok = false;
+            }
+
+            return ok;
+        }
+
+        function renderCart() {
+            if (cart.length === 0) {
+                $cartItems.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>';
+                $cartTotal.textContent = 'Total: $0.00';
+                $coreBadgeHeader.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            let hasCoreItems = false;
+
+            cart.forEach((item, index) => {
+                const itemTotal = (item.price || 0) * (item.quantity || 1);
+                total += itemTotal;
+                
+                if (item.corePart) hasCoreItems = true;
+                
+                html += `
+                <div class="cart-item" data-index="${index}">
+                    <div class="cart-item-main" onclick="toggleCoreDetails(${index})">
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">
+                                ${esc(item.name || 'Unnamed Item')}
+                                ${item.corePart ? '<span class="cart-item-core-badge">CORE</span>' : ''}
+                            </div>
+                            <div class="cart-item-price">
+                                ${fmtMoney(item.price)} × 
+                                <input type="number" min="1" value="${item.quantity || 1}" 
+                                       style="width: 60px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;"
+                                       onchange="updateItemQuantity(${index}, this.value)">
+                                = ${fmtMoney(itemTotal)}
+                            </div>
+                        </div>
+                        <div class="cart-item-expand ${item.corePart ? 'open' : ''}">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                    ${item.corePart ? `
+                    <div class="cart-item-core" style="display: block;">
+                        <div class="cart-item-core-content">
+                            <div class="cart-item-core-info">
+                                <div class="cart-item-core-name">Core Item</div>
+                                <div class="cart-item-core-desc">This item requires a core charge. Return your old part for a refund.</div>
+                            </div>
+                            <button class="cart-item-remove" onclick="removeItem(${index})">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            });
+
+            $cartItems.innerHTML = html;
+            $cartTotal.textContent = `Total: ${fmtMoney(total)}`;
+            $coreBadgeHeader.style.display = hasCoreItems ? 'flex' : 'none';
+        }
+
+        function toggleCoreDetails(index) {
+            const item = cart[index];
+            if (!item.corePart) return;
+            
+            const itemEl = document.querySelector(`.cart-item[data-index="${index}"]`);
+            const coreEl = itemEl.querySelector('.cart-item-core');
+            const expandEl = itemEl.querySelector('.cart-item-expand');
+            
+            if (coreEl.style.display === 'block') {
+                coreEl.style.display = 'none';
+                expandEl.classList.remove('open');
+            } else {
+                coreEl.style.display = 'block';
+                expandEl.classList.add('open');
+            }
+        }
+
+        function updateItemQuantity(index, quantity) {
+            quantity = parseInt(quantity);
+            if (isNaN(quantity) || quantity < 1) quantity = 1;
+            
+            cart[index].quantity = quantity;
+            localStorage.setItem('lf_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('lf_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function updateCartQuantities() {
+            // This would typically update quantities from input fields
+            // For now, we'll just save the current cart state
+            localStorage.setItem('lf_cart', JSON.stringify(cart));
+            alert('Cart quantities updated!');
+        }
+
+        function goHomePage() {
+            window.location.href = 'index.html';
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty. Add some items before checking out.');
+                return;
+            }
+            
+            if (!validateCustomerInfo()) {
+                alert('Please fill in all required customer information correctly.');
+                return;
+            }
+            
+            const customerInfo = saveCustomerInfo();
+            const paymentMethod = $paymentMethod.value;
+            
+            if (!paymentMethod) {
+                alert('Please select a payment method.');
+                return;
+            }
+            
+            // Show loading state
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            const originalText = checkoutBtn.innerHTML;
+            checkoutBtn.innerHTML = '<span class="loading"></span> Processing...';
+            checkoutBtn.disabled = true;
+            
+            // In a real application, you would send this data to your server
+            setTimeout(() => {
+                alert('Thank you for your order! We will contact you shortly to confirm availability and provide a payment link.');
+                
+                // Reset button state
+                checkoutBtn.innerHTML = originalText;
+                checkoutBtn.disabled = false;
+                
+                // Clear cart
+                cart = [];
+                localStorage.removeItem('lf_cart');
+                renderCart();
+            }, 2000);
+        }
+
+        // Payment method change handler
+        $paymentMethod.addEventListener('change', function() {
+            const notes = {
+                'credit_card': 'You will be redirected to our secure payment gateway to complete your credit card transaction.',
+                'paypal': 'You will be redirected to PayPal to complete your payment.',
+                'bank_wire': 'We will email you our bank details for wire transfer. Please include your order number as reference.',
+                'zelle': 'We will email you the Zelle payment details. Please include your order number in the memo.',
+                'ach': 'We will email you the ACH payment details. Please allow 2-3 business days for processing.',
+                '': ''
+            };
+            
+            $paymentNote.textContent = notes[this.value] || '';
         });
-      });
-      $items.querySelectorAll('[data-remove]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const norm = e.currentTarget.dataset.remove;
-          cart = cart.filter(x => x.__pn_norm !== norm);
-          saveCart(cart); render();
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCart();
+            
+            // Add input validation on blur
+            const requiredInputs = [
+                $customerEmail, $customerPhone, $customerName, 
+                $customerAddress1, $customerCity, $customerState, 
+                $customerZip, $customerCountry
+            ];
+            
+            requiredInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateCustomerInfo();
+                });
+            });
         });
-      });
-    }
-    render();
-
-    // Prefill customer from main page memory
-    (function prefill(){
-      try {
-        const raw = localStorage.getItem('lf_customer_info');
-        if (!raw) return;
-        const v = JSON.parse(raw);
-        $email.value = v.email || "";
-        $phone.value = v.phone || "";
-        $company.value = v.company || "";
-        $name.value = v.name || "";
-        $address1.value = v.address1 || "";
-        $address2.value = v.address2 || "";
-        $city.value = v.city || "";
-        $state.value = v.state || "";
-        $zip.value = v.zip || "";
-        $country.value = v.country || "US";
-        $instructions.value = v.instructions || "";
-        $engineModel.value = v.engineModel || "";
-        $engineSerial.value = v.engineSerial || "";
-      } catch(e){}
-    })();
-
-    function saveCustomer() {
-      const v = {
-        email: $email.value.trim(),
-        phone: $phone.value.trim(),
-        company: $company.value.trim(),
-        name: $name.value.trim(),
-        address1: $address1.value.trim(),
-        address2: $address2.value.trim(),
-        city: $city.value.trim(),
-        state: $state.value.trim(),
-        zip: $zip.value.trim(),
-        country: $country.value,
-        instructions: $instructions.value.trim(),
-        engineModel: $engineModel.value.trim(),
-        engineSerial: $engineSerial.value.trim()
-      };
-      localStorage.setItem('lf_customer_info', JSON.stringify(v));
-      return v;
-    }
-    function valid() {
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($email.value.trim());
-      const phoneOk = ($phone.value.trim().length >= 6);
-      return emailOk && phoneOk && $name.value.trim() && $address1.value.trim() && $city.value.trim() && $state.value.trim() && $zip.value.trim() && $country.value;
-    }
-
-    $checkout.addEventListener('click', () => {
-      if (!cart.length) { alert('Your cart is empty.'); return; }
-      if (!$pay.value) { alert('Please select a payment method.'); return; }
-      if (!valid()) { alert('Please complete required customer fields.'); return; }
-      const cust = saveCustomer();
-
-      // Build lines with DESCRIPTION included
-      const lines = cart.map(it => {
-        const unit = fmtMoney(it.__price_num, it.currency);
-        const core = Number(it.__core_num)>0 ? ` | Core: ${fmtMoney(it.__core_num, it.currency)} x ${it.quantity}` : '';
-        const desc = it.description ? ` | ${it.description}` : '';
-        return `• ${it.__pn}${desc} | Qty: ${it.quantity} | Unit: ${unit}${core}`;
-      }).join('%0A');
-
-      const subtotal = cart.reduce((s,it)=> s + (Number(it.__price_num)||0)*(it.quantity||1), 0);
-      const cores = cart.reduce((s,it)=> s + (Number(it.__core_num)||0)*(it.quantity||1), 0);
-      const est = subtotal + cores;
-
-      const subject = encodeURIComponent('New Parts Order Request - Limitless Website');
-      const customerBlock = encodeURIComponent(
-`Customer Details:
-• Name: ${cust.name}
-• Company: ${cust.company || '-'}
-• Email: ${cust.email}
-• Phone: ${cust.phone}
-
-Ship-To:
-• ${cust.address1}${cust.address2 ? ', ' + cust.address2 : ''}
-• ${cust.city}, ${cust.state} ${cust.zip}
-• ${cust.country}
-
-Engine Info (optional):
-• Engine Model: ${cust.engineModel || '-'}
-• Engine Serial: ${cust.engineSerial || '-'}
-
-Notes:
-${cust.instructions || '-'}`);
-
-      const body = 
-`Customer indicates they are ready to order.
-
-Items:
-${decodeURIComponent(lines)}
-
-Subtotal: ${fmtMoney(subtotal)}
-Core Charges: ${fmtMoney(cores)}
-Est. Total: ${fmtMoney(est)}
-
-Selected Payment Method: ${payMap[$pay.value]}
-
-${decodeURIComponent(customerBlock)}
-
-- Shipping & Handling will be calculated based on final weight, dimensions, and destination.
-- Please confirm availability and lead time before sending payment link.
-
-(Automatically generated from Cart page)`;
-
-      // launch email client
-      window.location.href = `mailto:info@limitless-llc.us?subject=${subject}&body=${encodeURIComponent(body)}`;
-    });
-  </script>
+    </script>
 </body>
 </html>
