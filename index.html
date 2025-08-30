@@ -129,6 +129,18 @@
         .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
         .update-cart-btn:hover { background: #1a202c; }
 
+        
+#lf-inline-cart {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
+}
+.search-section {
+    position: relative;
+}
+
+
         /* inline add-to-cart toast on a product card */
         .inline-toast {
           position: absolute;
@@ -170,7 +182,9 @@
     @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
     .loading{ display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;}
     @keyframes spin{ to{ transform:rotate(360deg);} }
-  </style>
+  
+.cart-section{display:none !important;}
+</style>
 </head>
 <body>
   <div class="container">
@@ -201,20 +215,21 @@
       </div>
 
       <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
+
+<div id="lf-inline-cart" style="text-align:right; margin:10px 0;">
+  <button id="show-cart-btn-inline" onclick="goCartPage()" style="background:#0074d9; color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer;">
+    <i class="fas fa-eye"></i> Show Cart
+  </button>
+</div>
+
     </div>
 
     <div class="results-grid" id="lf-results"></div>
-    <div id="lf-inline-cart-button" style="text-align:right; margin:10px 0;">
-      <button id="show-cart-btn-inline" onclick="goCartPage()" style="background:#0074d9; color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer;">
-        <i class="fas fa-eye"></i> Show Cart
-      </button>
-    </div>
-    
 
     <div class="cart-section">
       <div class="cart-header">
         <div class="cart-title"><i class="fas fa-shopping-cart"></i></div>
-        <button class="cart-toggle" onclick="goCartPage()"><i class="fas fa-eye"></i> Show Cart</button>
+        
       </div>
 
       <div class="cart-content" id="cart-content">
@@ -331,7 +346,19 @@
   </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js">
+</script>
+
+<script>
+    function saveCartToStorage() {
+      try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
+    }
+    function goCartPage() {
+      try { saveCartToStorage(); } catch(e) {}
+      window.location.href = 'cart.html';
+    }
+    
+</script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
     <script>
@@ -371,15 +398,6 @@
 			const $customerInstructions = document.getElementById('customer-instructions');
 
             let cart = [];
-
-function saveCartToStorage() {
-  try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
-}
-function goCartPage() {
-  saveCartToStorage();
-  window.location.href = 'cart.html';
-}
-
 
     const norm = s => (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
     const fmtMoney = (num, cur) => {
@@ -530,7 +548,9 @@ function goCartPage() {
                 const inCart = cart.some(item => item.__pn_norm === r.__pn_norm);
 const cartButtonText = inCart ? "Go to Cart" : "Add to Cart";
 const cartButtonIcon = inCart ? "fa-shopping-cart" : "fa-cart-plus";
-const cartButtonAction = inCart ? `onclick="goCartPage()"` : `onclick="addToCart('${r.__pn_norm}')"`
+const cartButtonAction = inCart
+    ? `onclick="goCartPage()"`
+    : `onclick="addToCart('${r.__pn_norm}')"`
 
                 const coreBadge = r.__core_num > 0 ? `
                     <div class="core-badge" title="Core Charge: ${fmtMoney(r.__core_num, r.currency)}. Refunded upon return of the used part per supplier policy.">
@@ -654,15 +674,7 @@ const cartButtonAction = inCart ? `onclick="goCartPage()"` : `onclick="addToCart
                 });
 
                 updateCart();
-                saveCartToStorage(); 
-// Ensure any "Go to Cart" buttons route to cart page
-document.querySelectorAll('button').forEach(function(b){
-  if (/Go to Cart/i.test(b.textContent)) {
-    b.setAttribute('onclick','goCartPage()');
-    b.onclick = function(){ goCartPage(); };
-  }
-});
-searchAndRender($in.value);
+                searchAndRender($in.value);
 
 // Update the button to "Go to Cart"
 const btn = document.querySelector(`button[onclick="addToCart('${partNorm}')"]`);
@@ -671,9 +683,8 @@ if (btn) {
     btn.disabled = false;
     btn.style.opacity = "1";
     btn.onclick = function() {
-        toggleCart();
-        document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' });
-    };
+        goCartPage();
+};
 }
 
 
@@ -701,7 +712,7 @@ if (card) {
             window.removeFromCart = function(partNorm) {
                 cart = cart.filter(item => item.__pn_norm !== partNorm);
                 updateCart();
-            saveCartToStorage(); };
+            };
 
             window.toggleCartItemCore = function(id) {
                 const el = document.getElementById(id);
@@ -732,7 +743,7 @@ if (card) {
                     }
                 });
                 updateCart();
-            saveCartToStorage(); };
+            };
 
             function updateCart() {
                 if (!cart.length) {
@@ -764,7 +775,7 @@ if (card) {
 
                     return `
                     <div class="cart-item">
-                        <div class="cart-item-main" onclick="goCartPage()">
+                        <div class="cart-item-main" onclick="toggleCartItemCore('exp-${item.__pn_norm}')">
                             <div class="cart-item-details">
                                 <div class="cart-item-name">
                                     ${item.__pn}
