@@ -212,16 +212,11 @@
 <div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
 </div>
 <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
-<div id="lf-inline-cart" style="text-align:right; margin:10px 0;">
-<button id="show-cart-btn-inline" onclick="goCartPage()" style="background:#0074d9; color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer;">
-<i class="fas fa-eye"></i> Show Cart
-  </button>
-</div>
+
 </div>
 <div class="results-grid" id="lf-results"></div>
 <div class="cart-section">
 <div class="cart-header">
-
 </div>
 <div class="cart-content" id="cart-content">
 <button class="update-cart-btn" onclick="updateCartQuantities()"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
@@ -378,6 +373,12 @@
 			const $customerInstructions = document.getElementById('customer-instructions');
 
             let cart = [];
+try {
+  const saved = localStorage.getItem('lf_cart');
+  if (saved) cart = JSON.parse(saved);
+} catch (e) {
+  console.error('Could not load cart from storage:', e);
+}
 
     const norm = s => (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
     const fmtMoney = (num, cur) => {
