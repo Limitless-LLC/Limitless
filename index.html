@@ -128,6 +128,24 @@
         .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
         .update-cart-btn:hover { background: #1a202c; }
 
+        /* Inline toast on card */
+        .inline-toast {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: #38a169;
+          color: #fff;
+          padding: 8px 12px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,.15);
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          z-index: 20;
+          pointer-events: none;
+        }
+
         /* Responsive */
 		@media (max-width:768px){
 		  .header h1{ font-size:2.2rem; }
@@ -212,7 +230,7 @@
               <input type="text" class="form-input" id="customer-company" placeholder="Your Company Name">
             </div>
 
-            <!-- NEW: Engine fields (optional) -->
+            <!-- Engine fields (optional) -->
             <div class="form-group">
               <label class="form-label" for="customer-engine-model">Engine Model (optional)</label>
               <input type="text" class="form-input" id="customer-engine-model" placeholder="e.g., Cummins QSB6.7">
@@ -351,7 +369,7 @@
 			const $customerCountry = document.getElementById('customer-country');
 			const $customerInstructions = document.getElementById('customer-instructions');
 
-            // NEW: refs for Engine Model/Serial
+            // NEW: refs for Engine fields
             const $customerEngineModel = document.getElementById('customer-engine-model');
             const $customerEngineSerial = document.getElementById('customer-engine-serial');
 
@@ -363,7 +381,6 @@
       if (!isFinite(n)) return String(num || "");
       return `${cur || CURRENCY_FALLBACK} ${n.toFixed(DECIMALS)}`;
     };
-    /* FIX #2: Escape helper for status text */
     const esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
       ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
     ));
@@ -386,7 +403,7 @@
         $customerCountry.value = v.country || "US";
         $customerInstructions.value = v.instructions || "";
 
-        // NEW: prefill engine fields
+        // Prefill engine fields
         $customerEngineModel.value = v.engine_model || "";
         $customerEngineSerial.value = v.engine_serial || "";
       } catch(e) { /* ignore */ }
@@ -406,7 +423,7 @@
         country: $customerCountry.value,
         instructions: $customerInstructions.value.trim(),
 
-        // NEW: engine fields
+        // Engine fields
         engine_model: $customerEngineModel.value.trim(),
         engine_serial: $customerEngineSerial.value.trim()
       };
@@ -432,9 +449,8 @@
       const zip = $customerZip.value.trim();
       const country = $customerCountry.value;
 
-      // basic patterns
       const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      const phoneOk = phone.length >= 6; // keep loose for international
+      const phoneOk = phone.length >= 6;
 
       showError($customerEmail, document.getElementById('email-error'), !emailOk);
       showError($customerPhone, document.getElementById('phone-error'), !phoneOk);
@@ -560,10 +576,9 @@
         return; 
     }
 
-    const qNorm = norm(q); // e.g., "4955354"
+    const qNorm = norm(q);
     let matches = [];
 
-    // Helpers
     const uniqByPn = (arr) => {
         const seen = new Set();
         const out = [];
@@ -577,9 +592,8 @@
     };
     const maybeFilterInStock = (arr) => $instock.checked ? arr.filter(r => r.__stock_num > 0) : arr;
 
-    // Precompute sets
-    const exactEq = rows.filter(r => r.__pn_norm === qNorm); // full equality
-    const pnSuffix = rows.filter(r => r.__pn_norm.endsWith(qNorm)); // ends-with match
+    const exactEq = rows.filter(r => r.__pn_norm === qNorm);
+    const pnSuffix = rows.filter(r => r.__pn_norm.endsWith(qNorm));
     const altSuffix = $alt.checked
         ? rows.filter(r => r.__alts_norm && r.__alts_norm.some(a => a.endsWith(qNorm)))
         : [];
@@ -597,8 +611,7 @@
 
         const exactCount = exactEq.length;
         const suffixCount = out.length - exactCount;
-        const partsWord = out.length === 1 ? "part" : "parts";
-        $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${out.length} ${partsWord} for "${q}" (${exactCount} exact, ${suffixCount} suffix)`;
+        $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${out.length} parts for "${q}" (${exactCount} exact, ${suffixCount} suffix)`;
         $results.innerHTML = out.map(renderCard).join("");
         return;
     }
@@ -635,15 +648,19 @@
                 updateCart();
                 searchAndRender($in.value);
 
-                // Success toast
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed; bottom: 20px; right: 20px; background: #38a169; color: white;
-                    padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
-                    z-index: 1000; animation: fadeIn .3s ease-out;`;
-                notification.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 2000);
+                // SUCCESS TOAST anchored to the product card (top-right)
+                const card = document.getElementById(`card-${partNorm}`);
+                if (card) {
+                  if (getComputedStyle(card).position === 'static') {
+                    card.style.position = 'relative';
+                  }
+                  const note = document.createElement('div');
+                  note.className = 'inline-toast';
+                  note.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+                  card.appendChild(note);
+                  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  setTimeout(() => note.remove(), 2000);
+                }
             };
 
             window.removeFromCart = function(partNorm) {
@@ -718,7 +735,6 @@
                                     ${item.__pn}
                                     ${hasCore ? '<span class="cart-item-core-badge">Core</span>' : ''}
                                 </div>
-                                <!-- NEW: show description -->
                                 <div class="cart-item-desc" style="color:#4a5568;font-size:13px;margin-top:2px;">
                                     ${item.description || '—'}
                                 </div>
@@ -747,7 +763,6 @@
                 $coreBadgeHeader.style.display = cart.some(x => Number(x.__core_num) > 0) ? 'inline-block' : 'none';
             }
 
-			// Payment notes
 			function updatePaymentNote() {
 			  const v = $paymentMethod.value;
 			  let text = '';
@@ -775,7 +790,7 @@
         alert('Please correct the highlighted customer fields.');
         return;
       }
-      const cust = saveCustomerInfo(); // persist
+      const cust = saveCustomerInfo();
 
       const payMap = {
         credit_card: 'Credit Card (+3.5% + $0.30)',
