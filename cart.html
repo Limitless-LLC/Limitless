@@ -356,6 +356,27 @@ ${decodeURIComponent(customerBlock)}
       // launch email client
       window.location.href = `mailto:info@limitless-llc.us?subject=${subject}&body=${encodeURIComponent(body)}`;
     });
-  </script>
+  
+
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  container.innerHTML = '';
+  if (!cart.length) {
+    container.innerHTML = '<div class="muted">Your cart is empty.</div>';
+    return;
+  }
+  cart.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <div><strong>${item.make || 'Unknown Make'}</strong> - ${item.model || 'Unknown Model'}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Run the renderCart on page load
+document.addEventListener('DOMContentLoaded', renderCart);
+</script>
 </body>
 </html>
