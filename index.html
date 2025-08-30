@@ -204,10 +204,16 @@
     </div>
 
     <div class="results-grid" id="lf-results"></div>
+    <div id="lf-inline-cart-button" style="text-align:right; margin:10px 0;">
+      <button id="show-cart-btn-inline" onclick="goCartPage()" style="background:#0074d9; color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer;">
+        <i class="fas fa-eye"></i> Show Cart
+      </button>
+    </div>
+    
 
     <div class="cart-section">
       <div class="cart-header">
-        <div class="cart-title"><i class="fas fa-shopping-cart"></i> Your Cart</div>
+        <div class="cart-title"><i class="fas fa-shopping-cart"></i></div>
         <button class="cart-toggle" onclick="goCartPage()"><i class="fas fa-eye"></i> Show Cart</button>
       </div>
 
@@ -524,9 +530,7 @@ function goCartPage() {
                 const inCart = cart.some(item => item.__pn_norm === r.__pn_norm);
 const cartButtonText = inCart ? "Go to Cart" : "Add to Cart";
 const cartButtonIcon = inCart ? "fa-shopping-cart" : "fa-cart-plus";
-const cartButtonAction = inCart
-    ? `onclick="goCartPage()"`
-    : `onclick="addToCart('${r.__pn_norm}')"`
+const cartButtonAction = inCart ? `onclick="goCartPage()"` : `onclick="addToCart('${r.__pn_norm}')"`
 
                 const coreBadge = r.__core_num > 0 ? `
                     <div class="core-badge" title="Core Charge: ${fmtMoney(r.__core_num, r.currency)}. Refunded upon return of the used part per supplier policy.">
