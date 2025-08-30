@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>Cart - Limitless LLC</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<style>
+  <meta charset="UTF-8" />
+  <title>Cart - Limitless LLC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
     * { box-sizing:border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { margin:0; background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%); color:#2d3748; }
     .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
@@ -34,110 +34,116 @@
   </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<h1><i class="fas fa-shopping-cart"></i> Cart</h1>
-<a class="back" href="index.html"><i class="fas fa-arrow-left"></i> Back to Finder</a>
-</div>
-<div class="card">
-<div class="section-title">Your Items</div>
-<div id="items"></div>
-<div class="totals" id="totals"></div>
-</div>
-<div class="card">
-<div class="section-title">Customer Information</div>
-<div class="grid">
-<div>
-<label class="label required" for="email">Email Address</label>
-<input class="input" id="email" placeholder="your.email@example.com" type="email"/>
-</div>
-<div>
-<label class="label required" for="phone">Phone Number</label>
-<input class="input" id="phone" placeholder="+1 470 608 3818" type="tel"/>
-</div>
-<div>
-<label class="label" for="company">Company Name</label>
-<input class="input" id="company" placeholder="Your Company" type="text"/>
-</div>
-<div>
-<label class="label required" for="name">Full Name</label>
-<input class="input" id="name" placeholder="First and Last Name" type="text"/>
-</div>
-<div>
-<label class="label required" for="address1">Address Line 1</label>
-<input class="input" id="address1" placeholder="Street address, P.O. box" type="text"/>
-</div>
-<div>
-<label class="label" for="address2">Address Line 2</label>
-<input class="input" id="address2" placeholder="Apt, suite, unit, etc." type="text"/>
-</div>
-<div>
-<label class="label required" for="city">City</label>
-<input class="input" id="city" placeholder="City" type="text"/>
-</div>
-<div>
-<label class="label required" for="state">State/Province/Region</label>
-<input class="input" id="state" placeholder="State / Province / Region" type="text"/>
-</div>
-<div>
-<label class="label required" for="zip">ZIP/Postal Code</label>
-<input class="input" id="zip" placeholder="ZIP / Postal code" type="text"/>
-</div>
-<div>
-<label class="label required" for="country">Country</label>
-<select class="select" id="country">
-<option value="">Select Country</option>
-<option selected="" value="US">United States</option>
-<option value="CA">Canada</option>
-<option value="MX">Mexico</option>
-<option value="AU">Australia</option>
-<option value="GB">United Kingdom</option>
-<option value="DE">Germany</option>
-<option value="FR">France</option>
-<option value="OTHER">Other</option>
-</select>
-</div>
-<!-- NEW optional engine fields -->
-<div>
-<label class="label" for="engineModel">Engine Model (optional)</label>
-<input class="input" id="engineModel" placeholder="e.g., Cummins ISX, CAT 3406" type="text"/>
-</div>
-<div>
-<label class="label" for="engineSerial">Engine Serial Number (optional)</label>
-<input class="input" id="engineSerial" placeholder="ESN / S/N" type="text"/>
-</div>
-<div style="grid-column:1 / -1;">
-<label class="label" for="instructions">Special Instructions</label>
-<textarea class="textarea" id="instructions" placeholder="Any shipping notes or info about your order"></textarea>
-</div>
-</div>
-</div>
-<div class="card">
-<div class="section-title">Payment Preference</div>
-<div class="grid">
-<div>
-<label class="label" for="pay">Choose payment method</label>
-<select class="select" id="pay">
-<option value="">Select a payment method</option>
-<option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
-<option value="paypal">PayPal</option>
-<option value="bank_wire">Bank Wire</option>
-<option value="zelle">Zelle</option>
-<option value="ach">ACH (U.S. only)</option>
-</select>
-</div>
-<div>
-<div class="muted" id="paynote"></div>
-</div>
-</div>
-<p class="muted" style="margin-top:8px;">
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-shopping-cart"></i> Cart</h1>
+      <a class="back" href="index.html"><i class="fas fa-arrow-left"></i> Back to Finder</a>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Your Items</div>
+      <div id="items"></div>
+      <div class="totals" id="totals"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Customer Information</div>
+      <div class="grid">
+        <div>
+          <label class="label required" for="email">Email Address</label>
+          <input id="email" type="email" class="input" placeholder="your.email@example.com">
+        </div>
+        <div>
+          <label class="label required" for="phone">Phone Number</label>
+          <input id="phone" type="tel" class="input" placeholder="+1 470 608 3818">
+        </div>
+        <div>
+          <label class="label" for="company">Company Name</label>
+          <input id="company" type="text" class="input" placeholder="Your Company">
+        </div>
+        <div>
+          <label class="label required" for="name">Full Name</label>
+          <input id="name" type="text" class="input" placeholder="First and Last Name">
+        </div>
+        <div>
+          <label class="label required" for="address1">Address Line 1</label>
+          <input id="address1" type="text" class="input" placeholder="Street address, P.O. box">
+        </div>
+        <div>
+          <label class="label" for="address2">Address Line 2</label>
+          <input id="address2" type="text" class="input" placeholder="Apt, suite, unit, etc.">
+        </div>
+        <div>
+          <label class="label required" for="city">City</label>
+          <input id="city" type="text" class="input" placeholder="City">
+        </div>
+        <div>
+          <label class="label required" for="state">State/Province/Region</label>
+          <input id="state" type="text" class="input" placeholder="State / Province / Region">
+        </div>
+        <div>
+          <label class="label required" for="zip">ZIP/Postal Code</label>
+          <input id="zip" type="text" class="input" placeholder="ZIP / Postal code">
+        </div>
+        <div>
+          <label class="label required" for="country">Country</label>
+          <select id="country" class="select">
+            <option value="">Select Country</option>
+            <option value="US" selected>United States</option>
+            <option value="CA">Canada</option>
+            <option value="MX">Mexico</option>
+            <option value="AU">Australia</option>
+            <option value="GB">United Kingdom</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+
+        <!-- NEW optional engine fields -->
+        <div>
+          <label class="label" for="engineModel">Engine Model (optional)</label>
+          <input id="engineModel" type="text" class="input" placeholder="e.g., Cummins ISX, CAT 3406">
+        </div>
+        <div>
+          <label class="label" for="engineSerial">Engine Serial Number (optional)</label>
+          <input id="engineSerial" type="text" class="input" placeholder="ESN / S/N">
+        </div>
+
+        <div style="grid-column:1 / -1;">
+          <label class="label" for="instructions">Special Instructions</label>
+          <textarea id="instructions" class="textarea" placeholder="Any shipping notes or info about your order"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Payment Preference</div>
+      <div class="grid">
+        <div>
+          <label class="label" for="pay">Choose payment method</label>
+          <select id="pay" class="select">
+            <option value="">Select a payment method</option>
+            <option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
+            <option value="paypal">PayPal</option>
+            <option value="bank_wire">Bank Wire</option>
+            <option value="zelle">Zelle</option>
+            <option value="ach">ACH (U.S. only)</option>
+          </select>
+        </div>
+        <div>
+          <div id="paynote" class="muted"></div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:8px;">
         Shipping &amp; Handling will be calculated after we confirm weight, dimensions, and destination.
       </p>
-<button class="checkout" id="checkout"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
-<div class="muted" style="margin-top:8px;">This emails your order details to Limitless; you’ll receive a confirmation and payment link.</div>
-</div>
-</div>
-<script>
+      <button class="checkout" id="checkout"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
+      <div class="muted" style="margin-top:8px;">This emails your order details to Limitless; you’ll receive a confirmation and payment link.</div>
+    </div>
+  </div>
+
+  <script>
     const $items = document.getElementById('items');
     const $totals = document.getElementById('totals');
     const $checkout = document.getElementById('checkout');
@@ -189,13 +195,7 @@
       try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
     }
 
-    let cart = [];
-try {
-  const saved = localStorage.getItem('lf_cart');
-  if (saved) cart = JSON.parse(saved);
-} catch (e) {
-  console.error('Could not load cart from storage:', e);
-}
+    let cart = loadCart();
 
     function render() {
       if (!cart.length) {
@@ -356,27 +356,6 @@ ${decodeURIComponent(customerBlock)}
       // launch email client
       window.location.href = `mailto:info@limitless-llc.us?subject=${subject}&body=${encodeURIComponent(body)}`;
     });
-  
-
-function renderCart() {
-  const container = document.getElementById('cart-items');
-  container.innerHTML = '';
-  if (!cart.length) {
-    container.innerHTML = '<div class="muted">Your cart is empty.</div>';
-    return;
-  }
-  cart.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <div><strong>${item.make || 'Unknown Make'}</strong> - ${item.model || 'Unknown Model'}</div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-// Run the renderCart on page load
-document.addEventListener('DOMContentLoaded', renderCart);
-</script>
+  </script>
 </body>
 </html>

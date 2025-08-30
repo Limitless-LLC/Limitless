@@ -1,22 +1,20 @@
 
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>Part Finder</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <title>Part Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Parts Finder - Limitless LLC</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parts Finder - Limitless LLC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #2d3748; line-height: 1.6; min-height: 100vh; padding: 0; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
@@ -131,18 +129,6 @@
         .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
         .update-cart-btn:hover { background: #1a202c; }
 
-        
-#lf-inline-cart {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    z-index: 10;
-}
-.search-section {
-    position: relative;
-}
-
-
         /* inline add-to-cart toast on a product card */
         .inline-toast {
           position: absolute;
@@ -184,158 +170,165 @@
     @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
     .loading{ display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;}
     @keyframes spin{ to{ transform:rotate(360deg);} }
-  
-.cart-section{display:none !important;}
-</style>
+  </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<h1><i class="fas fa-search"></i> Part Finder</h1>
-<p>Search our extensive inventory of diesel engine parts</p>
-<div class="cart-icon-header" onclick="goCartPage()">
-<i class="fas fa-shopping-cart"></i>
-<div class="cart-count" id="cart-count">0</div>
-</div>
-<div class="core-badge-header" id="core-badge-header">
-<i class="fas fa-exclamation-circle"></i> Core Items
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-search"></i> Part Finder</h1>
+      <p>Search our extensive inventory of diesel engine parts</p>
+
+      <div class="cart-icon-header" onclick="goCartPage()">
+
+        <i class="fas fa-shopping-cart"></i>
+        <div class="cart-count" id="cart-count">0</div>
       </div>
-</div>
-<div class="search-section">
-<div class="search-box">
-<input class="search-input" id="lf-input" placeholder="Enter part number, description, or keyword..."/>
-<button class="search-btn" id="lf-btn"><i class="fas fa-search"></i> Search</button>
-</div>
-<div class="filters">
-<div class="filter-item"><input checked="" id="lf-exact" type="checkbox"/><label for="lf-exact">Exact Match</label></div>
-<div class="filter-item"><input checked="" id="lf-alt" type="checkbox"/><label for="lf-alt">Include Alternate Parts</label></div>
-<div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
-</div>
-<div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
-</div>
-<div class="results-grid" id="lf-results"></div>
-<div class="cart-section">
-<div class="cart-header">
-</div>
-<div class="cart-content" id="cart-content">
-<button class="update-cart-btn" onclick="updateCartQuantities()"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
-<div class="cart-items" id="cart-items">
-<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>
-</div>
-<!-- Customer Information Section -->
-<div class="customer-info-section" id="customer-info-section">
-<div class="customer-info-title">Customer Information</div>
-<div class="customer-form">
-<div class="form-group">
-<label class="form-label form-required" for="customer-email">Email Address</label>
-<input class="form-input" id="customer-email" placeholder="your.email@example.com" type="email"/>
-<div class="form-error" id="email-error">Please enter a valid email address</div>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-phone">Phone Number</label>
-<input class="form-input" id="customer-phone" placeholder="+1 470 608 3818" type="tel"/>
-<div class="form-error" id="phone-error">Please enter a valid phone number</div>
-</div>
-<div class="form-group">
-<label class="form-label" for="customer-company">Company Name</label>
-<input class="form-input" id="customer-company" placeholder="Your Company Name" type="text"/>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-name">Full Name</label>
-<input class="form-input" id="customer-name" placeholder="First and Last Name" type="text"/>
-<div class="form-error" id="name-error">Please enter your name</div>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-address1">Address Line 1</label>
-<input class="form-input" id="customer-address1" placeholder="Street address, P.O. box" type="text"/>
-<div class="form-error" id="address1-error">Please enter your address</div>
-</div>
-<div class="form-group">
-<label class="form-label" for="customer-address2">Address Line 2</label>
-<input class="form-input" id="customer-address2" placeholder="Apartment, suite, unit, building, floor, etc." type="text"/>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-city">City</label>
-<input class="form-input" id="customer-city" placeholder="City" type="text"/>
-<div class="form-error" id="city-error">Please enter your city</div>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-state">State/Province/Region</label>
-<input class="form-input" id="customer-state" placeholder="State / Province / Region" type="text"/>
-<div class="form-error" id="state-error">Please enter your state/province</div>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-zip">ZIP/Postal Code</label>
-<input class="form-input" id="customer-zip" placeholder="ZIP / Postal code" type="text"/>
-<div class="form-error" id="zip-error">Please enter your ZIP/postal code</div>
-</div>
-<div class="form-group">
-<label class="form-label form-required" for="customer-country">Country</label>
-<select class="form-select" id="customer-country">
-<option value="">Select Country</option>
-<option selected="" value="US">United States</option>
-<option value="CA">Canada</option>
-<option value="MX">Mexico</option>
-<option value="AU">Australia</option>
-<option value="GB">United Kingdom</option>
-<option value="DE">Germany</option>
-<option value="FR">France</option>
-<option value="OTHER">Other</option>
-</select>
-<div class="form-error" id="country-error">Please select your country</div>
-</div>
-<div class="form-group" style="grid-column:1 / -1;">
-<label class="form-label" for="customer-instructions">Special Instructions</label>
-<textarea class="form-textarea" id="customer-instructions" placeholder="Any special shipping instructions or notes about your order"></textarea>
-</div>
-</div>
-</div>
-<div class="checkout-section">
-<div class="checkout-title">How Checkout Works</div>
-<div class="checkout-instructions">
+      <div class="core-badge-header" id="core-badge-header">
+        <i class="fas fa-exclamation-circle"></i> Core Items
+      </div>
+    </div>
+
+    <div class="search-section">
+      <div class="search-box">
+        <input id="lf-input" class="search-input" placeholder="Enter part number, description, or keyword...">
+        <button id="lf-btn" class="search-btn"><i class="fas fa-search"></i> Search</button>
+      </div>
+
+      <div class="filters">
+        <div class="filter-item"><input type="checkbox" id="lf-exact" checked><label for="lf-exact">Exact Match</label></div>
+        <div class="filter-item"><input type="checkbox" id="lf-alt" checked><label for="lf-alt">Include Alternate Parts</label></div>
+        <div class="filter-item"><input type="checkbox" id="lf-instock"><label for="lf-instock">In Stock Only</label></div>
+      </div>
+
+      <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
+    </div>
+
+    <div class="results-grid" id="lf-results"></div>
+
+    <div class="cart-section">
+      <div class="cart-header">
+        <div class="cart-title"><i class="fas fa-shopping-cart"></i> Your Cart</div>
+        <button class="cart-toggle" onclick="goCartPage()"><i class="fas fa-eye"></i> Show Cart</button>
+      </div>
+
+      <div class="cart-content" id="cart-content">
+        <button class="update-cart-btn" onclick="updateCartQuantities()"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
+        <div class="cart-items" id="cart-items">
+          <div class="empty-cart"><i class="fas fa-shopping-cart"></i><br> Your cart is empty</div>
+        </div>
+
+        <!-- Customer Information Section -->
+        <div class="customer-info-section" id="customer-info-section">
+          <div class="customer-info-title">Customer Information</div>
+          <div class="customer-form">
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-email">Email Address</label>
+              <input type="email" class="form-input" id="customer-email" placeholder="your.email@example.com">
+              <div class="form-error" id="email-error">Please enter a valid email address</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-phone">Phone Number</label>
+              <input type="tel" class="form-input" id="customer-phone" placeholder="+1 470 608 3818">
+              <div class="form-error" id="phone-error">Please enter a valid phone number</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="customer-company">Company Name</label>
+              <input type="text" class="form-input" id="customer-company" placeholder="Your Company Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-name">Full Name</label>
+              <input type="text" class="form-input" id="customer-name" placeholder="First and Last Name">
+              <div class="form-error" id="name-error">Please enter your name</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-address1">Address Line 1</label>
+              <input type="text" class="form-input" id="customer-address1" placeholder="Street address, P.O. box">
+              <div class="form-error" id="address1-error">Please enter your address</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="customer-address2">Address Line 2</label>
+              <input type="text" class="form-input" id="customer-address2" placeholder="Apartment, suite, unit, building, floor, etc.">
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-city">City</label>
+              <input type="text" class="form-input" id="customer-city" placeholder="City">
+              <div class="form-error" id="city-error">Please enter your city</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-state">State/Province/Region</label>
+              <input type="text" class="form-input" id="customer-state" placeholder="State / Province / Region">
+              <div class="form-error" id="state-error">Please enter your state/province</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-zip">ZIP/Postal Code</label>
+              <input type="text" class="form-input" id="customer-zip" placeholder="ZIP / Postal code">
+              <div class="form-error" id="zip-error">Please enter your ZIP/postal code</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-required" for="customer-country">Country</label>
+              <select class="form-select" id="customer-country">
+                <option value="">Select Country</option>
+                <option value="US" selected>United States</option>
+                <option value="CA">Canada</option>
+                <option value="MX">Mexico</option>
+                <option value="AU">Australia</option>
+                <option value="GB">United Kingdom</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <div class="form-error" id="country-error">Please select your country</div>
+            </div>
+            <div class="form-group" style="grid-column:1 / -1;">
+              <label class="form-label" for="customer-instructions">Special Instructions</label>
+              <textarea class="form-textarea" id="customer-instructions" placeholder="Any special shipping instructions or notes about your order"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-section">
+          <div class="checkout-title">How Checkout Works</div>
+          <div class="checkout-instructions">
             The Proceed to Checkout button does not process payment—it sends your order details to Limitless so we can confirm availability, shipping, and send you a secure payment link.
           </div>
-<div class="payment-method">
-<label class="payment-label" for="payment-method">Choose your preferred payment method:</label>
-<select class="payment-select" id="payment-method">
-<option value="">Select a payment method</option>
-<option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
-<option value="paypal">PayPal</option>
-<option value="bank_wire">Bank Wire</option>
-<option value="zelle">Zelle</option>
-<option value="ach">ACH (U.S. only)</option>
-</select>
-<div class="payment-note" id="payment-note"></div>
-</div>
-<div class="shipping-note">
-<strong>Shipping &amp; Handling:</strong> Calculated after we confirm weight, dimensions, and destination. You'll see the final S&amp;H on our reply email with your payment link.
+
+          <div class="payment-method">
+            <label class="payment-label" for="payment-method">Choose your preferred payment method:</label>
+            <select class="payment-select" id="payment-method">
+              <option value="">Select a payment method</option>
+              <option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
+              <option value="paypal">PayPal</option>
+              <option value="bank_wire">Bank Wire</option>
+              <option value="zelle">Zelle</option>
+              <option value="ach">ACH (U.S. only)</option>
+            </select>
+            <div class="payment-note" id="payment-note"></div>
           </div>
-<div class="compliance-notes">
-<div class="compliance-note">• Stock &amp; Lead Time: Availability and lead times are confirmed by email before payment.</div>
-<div class="compliance-note">• Tax: Sales tax, if applicable, is shown on your final invoice (or buyer may owe use tax).</div>
-<div class="compliance-note">• International: Duties and import charges are paid by the consignee unless otherwise agreed.</div>
-</div>
-<button class="checkout-btn" onclick="checkout()"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
-<div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
-</div>
-<div class="cart-total" id="cart-total">Total: $0.00</div>
-</div>
-</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js">
-</script>
-<script>
-    function saveCartToStorage() {
-      try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
-    }
-    function goCartPage() {
-      try { saveCartToStorage(); } catch(e) {}
-      window.location.href = 'cart.html';
-    }
-    
-</script>
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-<script>
+
+          <div class="shipping-note">
+            <strong>Shipping &amp; Handling:</strong> Calculated after we confirm weight, dimensions, and destination. You'll see the final S&amp;H on our reply email with your payment link.
+          </div>
+
+          <div class="compliance-notes">
+            <div class="compliance-note">• Stock &amp; Lead Time: Availability and lead times are confirmed by email before payment.</div>
+            <div class="compliance-note">• Tax: Sales tax, if applicable, is shown on your final invoice (or buyer may owe use tax).</div>
+            <div class="compliance-note">• International: Duties and import charges are paid by the consignee unless otherwise agreed.</div>
+          </div>
+
+          <button class="checkout-btn" onclick="checkout()"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
+          <div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
+        </div>
+
+        <div class="cart-total" id="cart-total">Total: $0.00</div>
+      </div>
+    </div>
+  </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
+    <script>
         (async () => {
             const CSV_URL = "parts_catalog_template.csv";
             const CURRENCY_FALLBACK = "USD";
@@ -372,12 +365,15 @@
 			const $customerInstructions = document.getElementById('customer-instructions');
 
             let cart = [];
-try {
-  const saved = localStorage.getItem('lf_cart');
-  if (saved) cart = JSON.parse(saved);
-} catch (e) {
-  console.error('Could not load cart from storage:', e);
+
+function saveCartToStorage() {
+  try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
 }
+function goCartPage() {
+  saveCartToStorage();
+  window.location.href = 'cart.html';
+}
+
 
     const norm = s => (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
     const fmtMoney = (num, cur) => {
@@ -654,7 +650,15 @@ const cartButtonAction = inCart
                 });
 
                 updateCart();
-                searchAndRender($in.value);
+                saveCartToStorage(); 
+// Ensure any "Go to Cart" buttons route to cart page
+document.querySelectorAll('button').forEach(function(b){
+  if (/Go to Cart/i.test(b.textContent)) {
+    b.setAttribute('onclick','goCartPage()');
+    b.onclick = function(){ goCartPage(); };
+  }
+});
+searchAndRender($in.value);
 
 // Update the button to "Go to Cart"
 const btn = document.querySelector(`button[onclick="addToCart('${partNorm}')"]`);
@@ -663,8 +667,9 @@ if (btn) {
     btn.disabled = false;
     btn.style.opacity = "1";
     btn.onclick = function() {
-        goCartPage();
-};
+        toggleCart();
+        document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' });
+    };
 }
 
 
@@ -692,7 +697,7 @@ if (card) {
             window.removeFromCart = function(partNorm) {
                 cart = cart.filter(item => item.__pn_norm !== partNorm);
                 updateCart();
-            };
+            saveCartToStorage(); };
 
             window.toggleCartItemCore = function(id) {
                 const el = document.getElementById(id);
@@ -723,7 +728,7 @@ if (card) {
                     }
                 });
                 updateCart();
-            };
+            saveCartToStorage(); };
 
             function updateCart() {
                 if (!cart.length) {
@@ -755,7 +760,7 @@ if (card) {
 
                     return `
                     <div class="cart-item">
-                        <div class="cart-item-main" onclick="toggleCartItemCore('exp-${item.__pn_norm}')">
+                        <div class="cart-item-main" onclick="goCartPage()">
                             <div class="cart-item-details">
                                 <div class="cart-item-name">
                                     ${item.__pn}
@@ -903,5 +908,6 @@ window.toggleCartAndScroll = function() {
   </script>
 </body>
 </html>
+
 </body>
 </html>
