@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<!--
+  CUSTOM SEARCH LOGIC UPDATE
+  --------------------------
+  Description:
+    Modified the exact part number search to ignore any leading letters or dashes 
+    and allow matches based on trailing numeric digits only (e.g. typing "3423456" 
+    will match "ABC-3423456", "-3423456", etc.).
+
+  Files/Sections Affected:
+    1. norm() function: now removes leading letters/dashes from part numbers.
+    2. search() function:
+       - Exact match uses .endsWith() instead of strict ===.
+       - Alternate part number check uses .some(...endsWith(...)).
+
+  Author: [Your Name or Initials]
+  Date: August 30, 2025
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Part Finder</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parts Finder - Limitless LLC</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); color: #2d3748; line-height: 1.6; min-height: 100vh; padding: 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 30px; padding: 30px 20px; background: linear-gradient(120deg, #2c3e50 0%, #3498db 100%); color: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.15); position: relative; }
+        .header h1 { font-size: 2.8rem; margin-bottom: 10px; font-weight: 700; }
+        .header p { font-size: 1.2rem; opacity: .9; max-width: 700px; margin: 0 auto; }
+        .cart-icon-header { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: white; display: flex; align-items: center; gap: 8px; }
+        .cart-count { background: #e74c3c; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+        .core-badge-header { position: absolute; top: 50px; right: 20px; background: #f39c12; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; display: none; }
+
+        /* Search */
+        .search-section { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,.08); margin-bottom: 30px; }
+        .search-box { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 300px; padding: 18px 22px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: .3s; box-shadow: 0 2px 5px rgba(0,0,0,.05); }
+        .search-input:focus { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,.2); outline: none; }
+        .search-btn { padding: 18px 32px; background: linear-gradient(120deg, #2980b9 0%, #3498db 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; transition: .3s; box-shadow: 0 4px 8px rgba(52,152,219,.3); }
+        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(52,152,219,.4); }
+
+        /* Filters */
+        .filters { display: flex; gap: 25px; flex-wrap: wrap; margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 12px; }
+        .filter-item { display: flex; align-items: center; gap: 10px; }
+        .filter-item input { width: 20px; height: 20px; cursor: pointer; }
+        .filter-item label { font-weight: 500; cursor: pointer; }
+
+        /* Status */
+        .status { padding: 15px 0; color: 4a5568; min-height: 24px; display: flex; align-items: center; gap: 10px; }
+
+        /* Results */
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .result-card { border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.08); transition: .3s; background: white; display: flex; flex-direction: column; position: relative; animation: fadeIn .5s ease-out; }
+        .result-card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,.15); }
+        .core-badge { position: absolute; top: 15px; right: 15px; background: #f39c12; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: help; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,.2); display: flex; align-items: center; gap: 5px; }
+        .card-image { display: flex; align-items: center; justify-content: center; height: 220px; border-bottom: 1px solid #f1f1f1; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
+        .card-image img { max-width: 85%; max-height: 200px; object-fit: contain; }
+        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .part-number { font-weight: 700; margin-bottom: 8px; font-size: 18px; color: #2c3e50; }
+        .brand-uom { font-size: 14px; color: #718096; margin-bottom: 12px; }
+        .description { font-size: 14px; color: #4a5568; margin-bottom: 15px; flex-grow: 1; }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .chip { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+        .chip.price { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+        .chip.stock { background: #f0fff4; color: #2f855a; border: 1px solid #c6f6d5; }
+        .chip.core { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+        .alt-pns { margin-top: 12px; font-size: 13px; color: #718096; }
+        .quantity-control { display: flex; align-items: center; margin: 15px 0; gap: 10px; }
+        .quantity-label { font-weight: 500; color: #4a5568; }
+        .quantity-input { width: 70px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-align: center; }
+        .action-buttons { display: flex; gap: 12px; margin-top: 10px; }
+        .action-btn { flex: 1; text-align: center; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 500; transition: .3s; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; cursor: pointer; }
+        .cart-btn { background: #2c3e50; color: white; border: 2px solid #2c3e50; }
+        .cart-btn:hover { background: #1a202c; }
+        .whatsapp-btn { background: white; color: #25D366; border: 2px solid #25D366; }
+        .whatsapp-btn:hover { background: #25D366; color: white; }
+
+        /* Cart */
+        .cart-section { margin-top: 40px; padding-top: 30px; border-top: 2px solid #e2e8f0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cart-title { font-size: 26px; color: #2c3e50; font-weight: 600; }
+        .cart-toggle { padding: 12px 24px; background: linear-gradient(120deg, #2980b9 0%, #3498db 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: .3s; }
+        .cart-toggle:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(52,152,219,.3); }
+        .cart-content { display: none; margin-top: 20px; background: white; border-radius: 16px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,.08); }
+        .cart-items { margin-bottom: 25px; }
+        .cart-item { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+        .cart-item-main { display: flex; justify-content: space-between; padding: 18px; align-items: center; background: #f8f9fa; cursor: pointer; }
+        .cart-item-details { flex: 1; }
+        .cart-item-name { font-weight: 600; margin-bottom: 6px; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
+        .cart-item-core-badge { background: #f39c12; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .cart-item-price { color: #718096; font-size: 14px; }
+        .cart-item-expand { color: #718096; font-size: 14px; transition: .3s; }
+        .cart-item-expand.open { transform: rotate(180deg); }
+        .cart-item-core { padding: 15px; background: #fff5f5; border-top: 1px solid #fed7d7; display: none; }
+        .cart-item-core-content { display: flex; justify-content: space-between; align-items: center; }
+        .cart-item-core-info { flex: 1; }
+        .cart-item-core-name { font-weight: 500; margin-bottom: 4px; color: #c53030; }
+        .cart-item-core-desc { color: #e53e3e; font-size: 13px; }
+        .cart-item-remove { color: #e53e3e; background: none; border: none; cursor: pointer; padding: 8px 16px; font-size: 14px; border-radius: 6px; transition: .3s; }
+        .cart-item-remove:hover { background: #fed7d7; }
+        .cart-total { font-weight: 700; text-align: right; padding: 20px 0; border-top: 2px solid #e2e8f0; font-size: 20px; color: #2c3e50; }
+		
+		/* Customer Information Section */
+		.customer-info-section { background:#f8f9fa; border-radius:12px; padding:20px; margin-bottom:20px; }
+		.customer-info-title { font-size:20px; color:#2c3e50; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0; }
+		.customer-form { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:15px; }
+		.form-group { margin-bottom:15px; }
+		.form-label { display:block; margin-bottom:6px; font-weight:500; color:#4a5568; }
+		.form-input, .form-textarea, .form-select { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; transition:border-color .3s; }
+		.form-input:focus, .form-textarea:focus, .form-select:focus { border-color:#3498db; outline:none; box-shadow:0 0 0 3px rgba(52,152,219,.2); }
+		.form-textarea { min-height:80px; resize:vertical; }
+		.form-required::after { content:"*"; color:#e53e3e; margin-left:4px; }
+		.form-error { color:#e53e3e; font-size:14px; margin-top:5px; display:none; }
+		.invalid { border-color:#e53e3e !important; box-shadow:0 0 0 3px rgba(229,62,62,.15) !important; }
+
+        /* Checkout box */
+        .checkout-section { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .checkout-title { font-size: 20px; color: #2c3e50; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+        .checkout-instructions { margin-bottom: 20px; line-height: 1.5; }
+        .payment-method { margin-bottom: 20px; }
+        .payment-label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .payment-select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-bottom: 8px; }
+        .payment-note { font-size: 14px; color: #4a5568; margin-bottom: 15px; padding: 10px; background: #edf2f7; border-radius: 6px; }
+        .shipping-note { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
+        .compliance-notes { font-size: 12px; color: #718096; margin-bottom: 20px; }
+        .compliance-note { margin-bottom: 5px; }
+        .checkout-btn { padding: 18px; background: linear-gradient(120deg, #38a169 0%, #48bb78 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; width: 100%; transition: .3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(72,187,120,.3); }
+        .checkout-helper { font-size: 12px; color: #718096; text-align: center; margin-top: 10px; }
+        .empty-cart { color: #a0aec0; font-style: italic; text-align: center; padding: 40px; font-size: 16px; }
+
+        /* Update Cart Button */
+        .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
+        .update-cart-btn:hover { background: #1a202c; }
+
+        
+#lf-inline-cart {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
+}
+.search-section {
+    position: relative;
+}
+
+
+        /* inline add-to-cart toast on a product card */
+        .inline-toast {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: #38a169;
+          color: #fff;
+          padding: 8px 12px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,.15);
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          z-index: 20;
+          pointer-events: none; /* don’t block clicks on the card */
+        }
+
+        /* Responsive */
+        @media (max-width:768px){
+
+
+        /* Responsive */
+		@media (max-width:768px){
+		  .header h1{ font-size:2.2rem; }
+		  .header p{ font-size:1rem; }
+		  .search-box{ flex-direction:column; }
+		  .search-input,.search-btn{ width:100%; }
+		  .filters{ flex-direction:column; gap:15px; }
+		  .results-grid{ grid-template-columns:1fr; }
+		  .action-buttons{ flex-direction:column; }
+		  .cart-item-main{ flex-direction:column; align-items:flex-start; gap:10px; }
+		  .cart-icon-header{ position:relative; top:0; right:0; margin-top:15px; justify-content:center; }
+		  .core-badge-header{ position:relative; top:0; right:0; margin:5px auto; width:fit-content; }
+		  .customer-form{ grid-template-columns:1fr; }
+        }
+
+    /* Animations */
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    .loading{ display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;}
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+  
+.cart-section{display:none !important;}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1><i class="fas fa-search"></i> Part Finder</h1>
+<p>Search our extensive inventory of diesel engine parts</p>
+<div class="cart-icon-header" onclick="goCartPage()">
+<i class="fas fa-shopping-cart"></i>
+<div class="cart-count" id="cart-count">0</div>
+</div>
+<div class="core-badge-header" id="core-badge-header">
+<i class="fas fa-exclamation-circle"></i> Core Items
+      </div>
+</div>
+<div class="search-section">
+<div class="search-box">
+<input class="search-input" id="lf-input" placeholder="Enter part number, description, or keyword..."/>
+<button class="search-btn" id="lf-btn"><i class="fas fa-search"></i> Search</button>
+</div>
+<div class="filters">
+<div class="filter-item"><input checked="" id="lf-exact" type="checkbox"/><label for="lf-exact">Exact Match</label></div>
+<div class="filter-item"><input checked="" id="lf-alt" type="checkbox"/><label for="lf-alt">Include Alternate Parts</label></div>
+<div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
+</div>
+<div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
+</div>
+<div class="results-grid" id="lf-results"></div>
+<div class="cart-section">
+<div class="cart-header">
+</div>
+<div class="cart-content" id="cart-content">
+<button class="update-cart-btn" onclick="updateCartQuantities()"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
+<div class="cart-items" id="cart-items">
+<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>
+</div>
+<!-- Customer Information Section -->
+<div class="customer-info-section" id="customer-info-section">
+<div class="customer-info-title">Customer Information</div>
+<div class="customer-form">
+<div class="form-group">
+<label class="form-label form-required" for="customer-email">Email Address</label>
+<input class="form-input" id="customer-email" placeholder="your.email@example.com" type="email"/>
+<div class="form-error" id="email-error">Please enter a valid email address</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-phone">Phone Number</label>
+<input class="form-input" id="customer-phone" placeholder="+1 470 608 3818" type="tel"/>
+<div class="form-error" id="phone-error">Please enter a valid phone number</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="customer-company">Company Name</label>
+<input class="form-input" id="customer-company" placeholder="Your Company Name" type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-name">Full Name</label>
+<input class="form-input" id="customer-name" placeholder="First and Last Name" type="text"/>
+<div class="form-error" id="name-error">Please enter your name</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-address1">Address Line 1</label>
+<input class="form-input" id="customer-address1" placeholder="Street address, P.O. box" type="text"/>
+<div class="form-error" id="address1-error">Please enter your address</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="customer-address2">Address Line 2</label>
+<input class="form-input" id="customer-address2" placeholder="Apartment, suite, unit, building, floor, etc." type="text"/>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-city">City</label>
+<input class="form-input" id="customer-city" placeholder="City" type="text"/>
+<div class="form-error" id="city-error">Please enter your city</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-state">State/Province/Region</label>
+<input class="form-input" id="customer-state" placeholder="State / Province / Region" type="text"/>
+<div class="form-error" id="state-error">Please enter your state/province</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-zip">ZIP/Postal Code</label>
+<input class="form-input" id="customer-zip" placeholder="ZIP / Postal code" type="text"/>
+<div class="form-error" id="zip-error">Please enter your ZIP/postal code</div>
+</div>
+<div class="form-group">
+<label class="form-label form-required" for="customer-country">Country</label>
+<select class="form-select" id="customer-country">
+<option value="">Select Country</option>
+<option selected="" value="US">United States</option>
+<option value="CA">Canada</option>
+<option value="MX">Mexico</option>
+<option value="AU">Australia</option>
+<option value="GB">United Kingdom</option>
+<option value="DE">Germany</option>
+<option value="FR">France</option>
+<option value="OTHER">Other</option>
+</select>
+<div class="form-error" id="country-error">Please select your country</div>
+</div>
+<div class="form-group" style="grid-column:1 / -1;">
+<label class="form-label" for="customer-instructions">Special Instructions</label>
+<textarea class="form-textarea" id="customer-instructions" placeholder="Any special shipping instructions or notes about your order"></textarea>
+</div>
+</div>
+</div>
+<div class="checkout-section">
+<div class="checkout-title">How Checkout Works</div>
+<div class="checkout-instructions">
+            The Proceed to Checkout button does not process payment—it sends your order details to Limitless so we can confirm availability, shipping, and send you a secure payment link.
+          </div>
+<div class="payment-method">
+<label class="payment-label" for="payment-method">Choose your preferred payment method:</label>
+<select class="payment-select" id="payment-method">
+<option value="">Select a payment method</option>
+<option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
+<option value="paypal">PayPal</option>
+<option value="bank_wire">Bank Wire</option>
+<option value="zelle">Zelle</option>
+<option value="ach">ACH (U.S. only)</option>
+</select>
+<div class="payment-note" id="payment-note"></div>
+</div>
+<div class="shipping-note">
+<strong>Shipping &amp; Handling:</strong> Calculated after we confirm weight, dimensions, and destination. You'll see the final S&amp;H on our reply email with your payment link.
+          </div>
+<div class="compliance-notes">
+<div class="compliance-note">• Stock &amp; Lead Time: Availability and lead times are confirmed by email before payment.</div>
+<div class="compliance-note">• Tax: Sales tax, if applicable, is shown on your final invoice (or buyer may owe use tax).</div>
+<div class="compliance-note">• International: Duties and import charges are paid by the consignee unless otherwise agreed.</div>
+</div>
+<button class="checkout-btn" onclick="checkout()"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
+<div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
+</div>
+<div class="cart-total" id="cart-total">Total: $0.00</div>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js">
+</script>
+<script>
+    function saveCartToStorage() {
+      try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
+    }
+    function goCartPage() {
+      try { saveCartToStorage(); } catch(e) {}
+      window.location.href = 'cart.html';
+    }
+    
+</script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+<script>
+        (async () => {
+            const CSV_URL = "parts_catalog_template.csv";
+            const CURRENCY_FALLBACK = "USD";
+            const DECIMALS = 2;
+
+            const $in = document.getElementById('lf-input');
+            const $go = document.getElementById('lf-btn');
+            const $status = document.getElementById('lf-status');
+            const $results = document.getElementById('lf-results');
+            const $exact = document.getElementById('lf-exact');
+            const $alt = document.getElementById('lf-alt');
+            const $instock = document.getElementById('lf-instock');
+
+            const $cartContent = document.getElementById('cart-content');
+            const $cartItems = document.getElementById('cart-items');
+            const $cartTotal = document.getElementById('cart-total');
+            const $cartCount = document.getElementById('cart-count');
+            const $coreBadgeHeader = document.getElementById('core-badge-header');
+
+            const $paymentMethod = document.getElementById('payment-method');
+            const $paymentNote = document.getElementById('payment-note');
+
+			// Customer fields
+			const $customerEmail = document.getElementById('customer-email');
+			const $customerPhone = document.getElementById('customer-phone');
+			const $customerCompany = document.getElementById('customer-company');
+			const $customerName = document.getElementById('customer-name');
+			const $customerAddress1 = document.getElementById('customer-address1');
+			const $customerAddress2 = document.getElementById('customer-address2');
+			const $customerCity = document.getElementById('customer-city');
+			const $customerState = document.getElementById('customer-state');
+			const $customerZip = document.getElementById('customer-zip');
+			const $customerCountry = document.getElementById('customer-country');
+			const $customerInstructions = document.getElementById('customer-instructions');
+
+            let cart = [];
+try {
+  const saved = localStorage.getItem('lf_cart');
+  if (saved) cart = JSON.parse(saved);
+} catch (e) {
+  console.error('Could not load cart from storage:', e);
+}
+
+    const norm = s => (s || "").toString().toUpperCase().replace(/^[A-Z\-]+/, "").replace(/[\s\-_.]/g, "");
+	const suffixOnly = s => norm(s).replace(/^[A-Z\-]+/, "");
+    const fmtMoney = (num, cur) => {
+      const n = Number(num);
+      if (!isFinite(n)) return String(num || "");
+      return `${cur || CURRENCY_FALLBACK} ${n.toFixed(DECIMALS)}`;
+    };
+    /* FIX #2: Escape helper for status text */
+    const esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+    ));
+
+    // Prefill from localStorage
+    (function prefill() {
+      try {
+        const raw = localStorage.getItem('lf_customer_info');
+        if (!raw) return;
+        const v = JSON.parse(raw);
+        $customerEmail.value = v.email || "";
+        $customerPhone.value = v.phone || "";
+        $customerCompany.value = v.company || "";
+        $customerName.value = v.name || ""
+        $customerAddress1.value = v.address1 || "";
+        $customerAddress2.value = v.address2 || "";
+        $customerCity.value = v.city || "";
+        $customerState.value = v.state || "";
+        $customerZip.value = v.zip || "";
+        $customerCountry.value = v.country || "US";
+        $customerInstructions.value = v.instructions || "";
+      } catch(e) { /* ignore */ }
+    })();
+
+    function saveCustomerInfo() {
+      const data = {
+        email: $customerEmail.value.trim(),
+        phone: $customerPhone.value.trim(),
+        company: $customerCompany.value.trim(),
+        name: $customerName.value.trim(),
+        address1: $customerAddress1.value.trim(),
+        address2: $customerAddress2.value.trim(),
+        city: $customerCity.value.trim(),
+        state: $customerState.value.trim(),
+        zip: $customerZip.value.trim(),
+        country: $customerCountry.value,
+        instructions: $customerInstructions.value.trim()
+      };
+      localStorage.setItem('lf_customer_info', JSON.stringify(data));
+      return data;
+    }
+
+    function showError(input, errorEl, show) {
+      if (!errorEl) return;
+      errorEl.style.display = show ? 'block' : 'none';
+      if (show) input.classList.add('invalid'); else input.classList.remove('invalid');
+    }
+
+    function validateCustomerInfo() {
+      let ok = true;
+
+      const email = $customerEmail.value.trim();
+      const phone = $customerPhone.value.trim();
+      const name = $customerName.value.trim();
+      const address1 = $customerAddress1.value.trim();
+      const city = $customerCity.value.trim();
+      const state = $customerState.value.trim();
+      const zip = $customerZip.value.trim();
+      const country = $customerCountry.value;
+
+      // basic patterns
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const phoneOk = phone.length >= 6; // keep loose for international
+
+      showError($customerEmail, document.getElementById('email-error'), !emailOk);
+      showError($customerPhone, document.getElementById('phone-error'), !phoneOk);
+      showError($customerName, document.getElementById('name-error'), name === "");
+      showError($customerAddress1, document.getElementById('address1-error'), address1 === "");
+      showError($customerCity, document.getElementById('city-error'), city === "");
+      showError($customerState, document.getElementById('state-error'), state === "");
+      showError($customerZip, document.getElementById('zip-error'), zip === "");
+      showError($customerCountry, document.getElementById('country-error'), !country);
+
+      ok = emailOk && phoneOk && name && address1 && city && state && zip && country;
+      return ok;
+    }
+
+            let rows = [];
+            try {
+                $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading parts catalog...';
+                const res = await fetch(CSV_URL, { cache: "no-store" });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const csvText = await res.text();
+
+                let parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true, dynamicTyping: true });
+                if (parsed.data.length && Object.keys(parsed.data[0]).length <= 1) {
+                    parsed = Papa.parse(csvText, { header: true, delimiter: "\t", skipEmptyLines: true, dynamicTyping: true });
+                }
+
+                rows = parsed.data.map(r => {
+                    const pn = (r.part_number ?? "").toString().trim();
+                    const alt = (r.alt_pns ?? "").toString().split(/[;,]/).map(s => s.trim()).filter(Boolean);
+                    return {
+                        ...r,
+                        __pn: pn,
+                        __pn_norm: norm(pn),
+                        __alts: alt,
+                        __alts_norm: alt.map(norm),
+                        __stock_num: Number(r.stock_qty ?? 0),
+                        __lead_num: Number(r.lead_days ?? 0),
+                        __price_num: Number(r.price ?? NaN),
+                        __core_num: Number(r.core_charge ?? 0),
+                        currency: r.currency || CURRENCY_FALLBACK
+                    };
+                }).filter(x => x.__pn);
+
+                if (!rows.length) { 
+                    $status.innerHTML = '<i class="fas fa-exclamation-circle"></i> No parts found in catalog. Please check your data source.'; 
+                    return; 
+                }
+                $status.innerHTML = '<i class="fas fa-check-circle"></i> Catalog loaded with ' + rows.length.toLocaleString() + ' parts. Start searching above.';
+            } catch (e) {
+                console.error("Catalog fetch error:", e);
+                $status.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Couldn\'t load catalog: ' + (e.message || e) + '. Please check your CSV URL.';
+                return;
+            }
+
+            const fuse = new Fuse(rows, {
+                includeScore: true,
+                threshold: 0.3,
+                keys: [
+                    { name: "__pn", weight: 0.7 },
+                    { name: "alt_pns", weight: 0.3 },
+                    { name: "description", weight: 0.2 }
+                ]
+            });
+
+            function search() {
+                const query = $in.value.trim();
+                if (!query) { 
+                    $results.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><br/>Enter a part number or description to search</div>'; 
+                    return; 
+                }
+
+                $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Searching...';
+
+                let results = [];
+                if ($exact.checked) {
+                    const qn = suffixOnly(query);
+                    const exactMatch = rows.find(r =>
+					r.__pn_norm === qn || suffixOnly(r.__pn_norm).endsWith(qn)
+					);
+                    if (exactMatch) results.push({ item: exactMatch, score: 0 });
+
+                    if ($alt.checked) {
+                        const altMatch = rows.find(r => r.__alts_norm.some(alt => suffixOnly(alt).endsWith(qn)));
+                        if (altMatch && (!exactMatch || exactMatch.__pn !== altMatch.__pn)) results.push({ item: altMatch, score: 0.1 });
+                    }
+                } else {
+                    results = fuse.search(query);
+                }
+
+                if ($instock.checked) {
+                    results = results.filter(r => r.item.__stock_num > 0);
+                }
+
+                results.sort((a, b) => (a.score || 0) - (b.score || 0));
+
+                if (!results.length) {
+                    $results.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><br/>No matching parts found</div>';
+                    $status.innerHTML = '<i class="fas fa-info-circle"></i> No results for "' + esc(query) + '"';
+                    return;
+                }
+
+                $results.innerHTML = results.slice(0, 100).map(r => {
+                    const p = r.item;
+                    const inCart = cart.findIndex(x => x.part_number === p.__pn);
+                    const qtyInCart = inCart >= 0 ? cart[inCart].quantity : 0;
+                    const isCore = p.__core_num > 0;
+
+                    return `
+                        <div class="result-card">
+                            ${isCore ? `<div class="core-badge" title="Core charge applies"><i class="fas fa-exclamation-circle"></i> Core</div>` : ''}
+                            <div class="card-image">
+                                <img src="${p.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${p.__pn}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"/>
+                            </div>
+                            <div class="card-content">
+                                <div class="part-number">${esc(p.__pn)}</div>
+                                <div class="brand-uom">${esc(p.brand || '')} | ${esc(p.uom || '')}</div>
+                                <div class="description">${esc(p.description || '')}</div>
+                                <div class="chips">
+                                    <span class="chip price"><i class="fas fa-tag"></i> ${fmtMoney(p.__price_num, p.currency)}</span>
+                                    <span class="chip stock"><i class="fas fa-box"></i> ${p.__stock_num > 0 ? p.__stock_num + ' in stock' : 'Out of stock'}</span>
+                                    ${isCore ? `<span class="chip core"><i class="fas fa-exclamation-circle"></i> Core: ${fmtMoney(p.__core_num, p.currency)}</span>` : ''}
+                                </div>
+                                ${p.__alts.length ? `<div class="alt-pns"><strong>Alternates:</strong> ${esc(p.__alts.join(', '))}</div>` : ''}
+                                <div class="quantity-control">
+                                    <span class="quantity-label">Quantity:</span>
+                                    <input type="number" class="quantity-input" id="qty-${idSafe(p.__pn)}" value="${qtyInCart || 1}" min="1" max="${p.__stock_num > 0 ? p.__stock_num : 9999}"/>
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="action-btn cart-btn" onclick="addToCart('${esc(p.__pn)}', ${p.__price_num}, '${p.currency}', ${p.__core_num}, '${esc(p.description || '')}')">
+                                        <i class="fas fa-cart-plus"></i> ${qtyInCart ? 'Update' : 'Add to'} Cart
+                                    </button>
+                                    <a class="action-btn whatsapp-btn" href="https://wa.me/?text=${encodeURIComponent('I need information about part ' + p.__pn)}" target="_blank">
+                                        <i class="fab fa-whatsapp"></i> WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${results.length} result(s) for "${esc(query)}"`;
+            }
+
+            
+function idSafe(value) {
+  return (value || "").replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+function addToCart(partNumber, price, currency, coreCharge, description) {
+                const qtyEl = document.getElementById(`qty-${partNumber}`);
+                const quantity = Math.max(1, parseInt(qtyEl?.value || 1));
+
+                const existingIndex = cart.findIndex(x => x.part_number === partNumber);
+                if (existingIndex >= 0) {
+                    cart[existingIndex].quantity = quantity;
+                } else {
+                    cart.push({
+                        part_number: partNumber,
+                        quantity: quantity,
+                        price: price,
+                        currency: currency,
+                        core_charge: coreCharge,
+                        description: description
+                    });
+                }
+
+                updateCartUI();
+                saveCartToStorage();
+
+                // Show inline toast
+                const toast = document.createElement('div');
+                toast.className = 'inline-toast';
+                toast.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+                document.querySelector(`#qty-${partNumber}`).closest('.result-card').appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+            }
+
+            function updateCartUI() {
+                const hasItems = cart.length > 0;
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                const hasCore = cart.some(item => item.core_charge > 0);
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const coreTotal = cart.reduce((sum, item) => sum + (item.core_charge * item.quantity), 0);
+
+                $cartCount.textContent = totalItems;
+                $coreBadgeHeader.style.display = hasCore ? 'flex' : 'none';
+
+                if (hasItems) {
+                    $cartItems.innerHTML = cart.map((item, index) => {
+                        const itemTotal = item.price * item.quantity;
+                        const coreTotal = item.core_charge * item.quantity;
+                        const isCore = item.core_charge > 0;
+                        return `
+                            <div class="cart-item">
+                                <div class="cart-item-main" onclick="toggleCartItem(${index})">
+                                    <div class="cart-item-details">
+                                        <div class="cart-item-name">
+                                            ${esc(item.part_number)}
+                                            ${isCore ? `<span class="cart-item-core-badge">Core</span>` : ''}
+                                        </div>
+                                        <div class="cart-item-price">${fmtMoney(item.price, item.currency)} × ${item.quantity} = ${fmtMoney(itemTotal, item.currency)}</div>
+                                    </div>
+                                    <div class="cart-item-expand"><i class="fas fa-chevron-down"></i></div>
+                                </div>
+                                ${isCore ? `
+                                    <div class="cart-item-core">
+                                        <div class="cart-item-core-content">
+                                            <div class="cart-item-core-info">
+                                                <div class="cart-item-core-name">Core Charge: ${fmtMoney(item.core_charge, item.currency)} × ${item.quantity}</div>
+                                                <div class="cart-item-core-desc">Refundable when core is returned</div>
+                                            </div>
+                                            <div class="cart-item-core-total">${fmtMoney(coreTotal, item.currency)}</div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                    $cartTotal.textContent = `Total: ${fmtMoney(total, CURRENCY_FALLBACK)}${hasCore ? ` + Core: ${fmtMoney(coreTotal, CURRENCY_FALLBACK)}` : ''}`;
+                } else {
+                    $cartItems.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>';
+                    $cartTotal.textContent = 'Total: $0.00';
+                }
+
+                saveCartToStorage();
+            }
+
+            function toggleCartItem(index) {
+                const itemEl = $cartItems.children[index];
+                const expandEl = itemEl.querySelector('.cart-item-expand');
+                const coreEl = itemEl.querySelector('.cart-item-core');
+                
+                if (coreEl) {
+                    const isOpen = coreEl.style.display === 'block';
+                    coreEl.style.display = isOpen ? 'none' : 'block';
+                    expandEl.classList.toggle('open', !isOpen);
+                }
+            }
+
+            function updateCartQuantities() {
+                cart.forEach((item, index) => {
+                    const qtyEl = document.getElementById(`cart-qty-${index}`);
+                    if (qtyEl) {
+                        const newQty = parseInt(qtyEl.value);
+                        if (!isNaN(newQty) && newQty >= 0) {
+                            item.quantity = newQty;
+                        }
+                    }
+                });
+                updateCartUI();
+            }
+
+            function removeFromCart(index) {
+                cart.splice(index, 1);
+                updateCartUI();
+            }
+
+            function checkout() {
+                if (!validateCustomerInfo()) {
+                    alert('Please fix the errors in the customer information form before proceeding.');
+                    return;
+                }
+
+                const customer = saveCustomerInfo();
+                const paymentMethod = $paymentMethod.value;
+                const paymentNoteText = $paymentNote.textContent;
+
+                if (!paymentMethod) {
+                    alert('Please select a payment method.');
+                    return;
+                }
+
+                const subject = encodeURIComponent(`Order Request: ${cart.length} items`);
+                let body = "Order Details:\n\n";
+
+                cart.forEach(item => {
+                    body += `Part: ${item.part_number}\n`;
+                    body += `Qty: ${item.quantity}\n`;
+                    body += `Price: ${fmtMoney(item.price, item.currency)}\n`;
+                    if (item.core_charge > 0) {
+                        body += `Core Charge: ${fmtMoney(item.core_charge, item.currency)}\n`;
+                    }
+                    body += `Description: ${item.description}\n`;
+                    body += "---\n";
+                });
+
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const coreTotal = cart.reduce((sum, item) => sum + (item.core_charge * item.quantity), 0);
+                body += `\nSubtotal: ${fmtMoney(total, CURRENCY_FALLBACK)}\n`;
+                if (coreTotal > 0) {
+                    body += `Core Total: ${fmtMoney(coreTotal, CURRENCY_FALLBACK)}\n`;
+                }
+                body += `\nCustomer Information:\n`;
+                body += `Name: ${customer.name}\n`;
+                body += `Email: ${customer.email}\n`;
+                body += `Phone: ${customer.phone}\n`;
+                if (customer.company) body += `Company: ${customer.company}\n`;
+                body += `Address: ${customer.address1}\n`;
+                if (customer.address2) body += `Address 2: ${customer.address2}\n`;
+                body += `City: ${customer.city}\n`;
+                body += `State: ${customer.state}\n`;
+                body += `ZIP: ${customer.zip}\n`;
+                body += `Country: ${customer.country}\n`;
+                if (customer.instructions) body += `Instructions: ${customer.instructions}\n`;
+                body += `\nPayment Method: ${$paymentMethod.options[$paymentMethod.selectedIndex].text}\n`;
+                body += `Payment Note: ${paymentNoteText}\n`;
+
+                const mailtoLink = `mailto:info@limitlessllc.com?subject=${subject}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+            }
+
+            $paymentMethod.addEventListener('change', () => {
+                const opt = $paymentMethod.options[$paymentMethod.selectedIndex];
+                let note = "";
+                switch(opt.value) {
+                    case "credit_card": note = "We'll send a secure payment link for credit card processing (2.9% fee)."; break;
+                    case "paypal": note = "We'll send a PayPal invoice (3.5% fee)."; break;
+                    case "bank_wire": note = "We'll email our bank details for wire transfer (no fee, must clear before shipping)."; break;
+                    case "zelle": note = "We'll provide Zelle details (U.S. only, no fee)."; break;
+                    case "ach": note = "We'll provide ACH details (U.S. only, no fee)."; break;
+                    default: note = "Select a payment method to see details."; break;
+                }
+                $paymentNote.textContent = note;
+            });
+
+            $go.addEventListener('click', search);
+            $in.addEventListener('keypress', e => { if (e.key === 'Enter') search(); });
+            $exact.addEventListener('change', search);
+            $alt.addEventListener('change', search);
+            $instock.addEventListener('change', search);
+
+            updateCartUI();
+        })();
+    </script>
+
+<script>
+  // PATCH 1: Initialize cart UI at load
+  document.addEventListener('DOMContentLoaded', () => {
+    try {
+      updateCartUI(); // Sync cart UI even before search
+    } catch (e) {
+      console.error('Cart UI init error:', e);
+    }
+  });
+
+  // PATCH 2: Defensive coding in addToCart
+  function addToCart(partNumber, price, currency, coreCharge, description) {
+    try {
+      const qtyEl = document.getElementById(`qty-${partNumber}`);
+      const quantity = Math.max(1, parseInt(qtyEl?.value || 1));
+
+      const existingIndex = cart.findIndex(x => x.part_number === partNumber);
+      if (existingIndex >= 0) {
+        cart[existingIndex].quantity = quantity;
+      } else {
+        cart.push({
+          part_number: partNumber,
+          quantity: quantity,
+          price: price,
+          currency: currency,
+          core_charge: coreCharge,
+          description: description
+        });
+      }
+
+      updateCartUI();
+      saveCartToStorage();
+
+      // Inline confirmation toast
+      const toast = document.createElement('div');
+      toast.className = 'inline-toast';
+      toast.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+      document.querySelector(`#qty-${partNumber}`)?.closest('.result-card')?.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    } catch (e) {
+      console.error("Add to cart error:", e);
+      alert("⚠️ Failed to add item to cart. Please try again.");
+    }
+  }
+</script>
+
+
+<script>
+function idSafe(value) {
+    return (value || "").replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+function addToCart(partNumber, price, currency, coreCharge, description) {
+    const safeId = idSafe(partNumber);
+    const qtyEl = document.getElementById(`qty-${safeId}`);
+    const quantity = Math.max(1, parseInt(qtyEl?.value || 1));
+
+    let cart = [];
+    try {
+        const saved = localStorage.getItem('lf_cart');
+        if (saved) cart = JSON.parse(saved);
+    } catch (e) {
+        console.error('Could not load cart from storage:', e);
+    }
+
+    const existingIndex = cart.findIndex(x => x.part_number === partNumber);
+    const itemData = {
+        part_number: partNumber,
+        name: partNumber,
+        description: description || "",
+        quantity: quantity,
+        price: price,
+        currency: currency,
+        core_charge: coreCharge,
+        corePart: coreCharge > 0
+    };
+
+    if (existingIndex >= 0) {
+        cart[existingIndex] = itemData;
+    } else {
+        cart.push(itemData);
+    }
+
+    try {
+        localStorage.setItem('lf_cart', JSON.stringify(cart));
+    } catch (e) {
+        console.error('Could not save cart to storage:', e);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'inline-toast';
+    toast.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+
+    const card = qtyEl.closest('.result-card');
+    if (card) {
+        card.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    const $cartCount = document.getElementById('cart-count');
+    if ($cartCount) {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        $cartCount.textContent = totalItems;
+    }
+
+    const $coreBadgeHeader = document.getElementById('core-badge-header');
+    if ($coreBadgeHeader) {
+        const hasCore = cart.some(item => item.corePart);
+        $coreBadgeHeader.style.display = hasCore ? 'flex' : 'none';
+    }
+}
+</script>
+
+</body>
+</html>
