@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,7 +129,7 @@
         .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
         .update-cart-btn:hover { background: #1a202c; }
 
-        /* Inline toast on card */
+        /* inline add-to-cart toast on a product card */
         .inline-toast {
           position: absolute;
           top: 12px;
@@ -143,8 +144,12 @@
           align-items: center;
           gap: 8px;
           z-index: 20;
-          pointer-events: none;
+          pointer-events: none; /* don’t block clicks on the card */
         }
+
+        /* Responsive */
+        @media (max-width:768px){
+
 
         /* Responsive */
 		@media (max-width:768px){
@@ -173,7 +178,8 @@
       <h1><i class="fas fa-search"></i> Part Finder</h1>
       <p>Search our extensive inventory of diesel engine parts</p>
 
-      <div class="cart-icon-header" onclick="toggleCart()">
+      <div class="cart-icon-header" onclick="goCartPage()">
+
         <i class="fas fa-shopping-cart"></i>
         <div class="cart-count" id="cart-count">0</div>
       </div>
@@ -202,7 +208,7 @@
     <div class="cart-section">
       <div class="cart-header">
         <div class="cart-title"><i class="fas fa-shopping-cart"></i> Your Cart</div>
-        <button class="cart-toggle" onclick="toggleCart()"><i class="fas fa-eye"></i> Show Cart</button>
+        <button class="cart-toggle" onclick="goCartPage()"><i class="fas fa-eye"></i> Show Cart</button>
       </div>
 
       <div class="cart-content" id="cart-content">
@@ -229,17 +235,6 @@
               <label class="form-label" for="customer-company">Company Name</label>
               <input type="text" class="form-input" id="customer-company" placeholder="Your Company Name">
             </div>
-
-            <!-- Engine fields (optional) -->
-            <div class="form-group">
-              <label class="form-label" for="customer-engine-model">Engine Model (optional)</label>
-              <input type="text" class="form-input" id="customer-engine-model" placeholder="e.g., Cummins QSB6.7">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="customer-engine-serial">Engine Serial # (optional)</label>
-              <input type="text" class="form-input" id="customer-engine-serial" placeholder="e.g., 12345678">
-            </div>
-
             <div class="form-group">
               <label class="form-label form-required" for="customer-name">Full Name</label>
               <input type="text" class="form-input" id="customer-name" placeholder="First and Last Name">
@@ -369,11 +364,16 @@
 			const $customerCountry = document.getElementById('customer-country');
 			const $customerInstructions = document.getElementById('customer-instructions');
 
-            // NEW: refs for Engine fields
-            const $customerEngineModel = document.getElementById('customer-engine-model');
-            const $customerEngineSerial = document.getElementById('customer-engine-serial');
-
             let cart = [];
+
+function saveCartToStorage() {
+  try { localStorage.setItem('lf_cart', JSON.stringify(cart)); } catch(e) {}
+}
+function goCartPage() {
+  saveCartToStorage();
+  window.location.href = 'cart.html';
+}
+
 
     const norm = s => (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
     const fmtMoney = (num, cur) => {
@@ -381,6 +381,7 @@
       if (!isFinite(n)) return String(num || "");
       return `${cur || CURRENCY_FALLBACK} ${n.toFixed(DECIMALS)}`;
     };
+    /* FIX #2: Escape helper for status text */
     const esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
       ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
     ));
@@ -402,10 +403,6 @@
         $customerZip.value = v.zip || "";
         $customerCountry.value = v.country || "US";
         $customerInstructions.value = v.instructions || "";
-
-        // Prefill engine fields
-        $customerEngineModel.value = v.engine_model || "";
-        $customerEngineSerial.value = v.engine_serial || "";
       } catch(e) { /* ignore */ }
     })();
 
@@ -421,11 +418,7 @@
         state: $customerState.value.trim(),
         zip: $customerZip.value.trim(),
         country: $customerCountry.value,
-        instructions: $customerInstructions.value.trim(),
-
-        // Engine fields
-        engine_model: $customerEngineModel.value.trim(),
-        engine_serial: $customerEngineSerial.value.trim()
+        instructions: $customerInstructions.value.trim()
       };
       localStorage.setItem('lf_customer_info', JSON.stringify(data));
       return data;
@@ -449,8 +442,9 @@
       const zip = $customerZip.value.trim();
       const country = $customerCountry.value;
 
+      // basic patterns
       const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      const phoneOk = phone.length >= 6;
+      const phoneOk = phone.length >= 6; // keep loose for international
 
       showError($customerEmail, document.getElementById('email-error'), !emailOk);
       showError($customerPhone, document.getElementById('phone-error'), !phoneOk);
@@ -528,11 +522,12 @@
                 const alt = (r.alt_pns || "").toString().split(/[;,]/).map(s=>s.trim()).filter(Boolean);
                 const alts = alt.length ? `<div class="alt-pns"><strong>Alternate Part Numbers:</strong> ${alt.join(", ")}</div>` : "";
                 const inCart = cart.some(item => item.__pn_norm === r.__pn_norm);
-                const cartButtonText = inCart ? "Go to Cart" : "Add to Cart";
-                const cartButtonIcon = inCart ? "fa-shopping-cart" : "fa-cart-plus";
-                const cartButtonAction = inCart
-                    ? `onclick="toggleCart(); document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' })"`
-                    : `onclick="addToCart('${r.__pn_norm}')"`
+const cartButtonText = inCart ? "Go to Cart" : "Add to Cart";
+const cartButtonIcon = inCart ? "fa-shopping-cart" : "fa-cart-plus";
+const cartButtonAction = inCart
+    ? `onclick="goCartPage()"`
+    : `onclick="addToCart('${r.__pn_norm}')"`
+
                 const coreBadge = r.__core_num > 0 ? `
                     <div class="core-badge" title="Core Charge: ${fmtMoney(r.__core_num, r.currency)}. Refunded upon return of the used part per supplier policy.">
                         <i class="fas fa-exclamation-circle"></i> Core
@@ -558,8 +553,9 @@
                         </div>
                         <div class="action-buttons">
                             <button ${cartButtonAction} class="action-btn cart-btn">
-                                <i class="fas ${cartButtonIcon}"></i> ${cartButtonText}
-                            </button>
+    <i class="fas ${cartButtonIcon}"></i> ${cartButtonText}
+</button>
+
                             <a href="https://wa.me/14706083818?text=${encodeURIComponent('I want to order ' + r.__pn)}" class="action-btn whatsapp-btn" target="_blank" rel="noopener">
                                 <i class="fab fa-whatsapp"></i> WhatsApp
                             </a>
@@ -576,9 +572,10 @@
         return; 
     }
 
-    const qNorm = norm(q);
+    const qNorm = norm(q); // e.g., "4955354"
     let matches = [];
 
+    // Helpers
     const uniqByPn = (arr) => {
         const seen = new Set();
         const out = [];
@@ -592,8 +589,9 @@
     };
     const maybeFilterInStock = (arr) => $instock.checked ? arr.filter(r => r.__stock_num > 0) : arr;
 
-    const exactEq = rows.filter(r => r.__pn_norm === qNorm);
-    const pnSuffix = rows.filter(r => r.__pn_norm.endsWith(qNorm));
+    // Precompute sets
+    const exactEq = rows.filter(r => r.__pn_norm === qNorm); // full equality
+    const pnSuffix = rows.filter(r => r.__pn_norm.endsWith(qNorm)); // ends-with match
     const altSuffix = $alt.checked
         ? rows.filter(r => r.__alts_norm && r.__alts_norm.some(a => a.endsWith(qNorm)))
         : [];
@@ -601,6 +599,9 @@
     const fuzzy = fuse.search(q).map(x => x.item);
 
     if ($exact.checked) {
+        // Exact mode now means "exact OR suffix-exact" (PN ends with query),
+        // plus suffix matches in alternate numbers if Include Alt is on.
+        // Order: exact equality first, then PN suffix, then ALT suffix.
         const ordered = uniqByPn([...exactEq, ...pnSuffix, ...altSuffix]);
 
         let out = maybeFilterInStock(ordered);
@@ -609,13 +610,16 @@
             return;
         }
 
+        // Status text
         const exactCount = exactEq.length;
         const suffixCount = out.length - exactCount;
-        $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${out.length} parts for "${q}" (${exactCount} exact, ${suffixCount} suffix)`;
+        const partsWord = out.length === 1 ? "part" : "parts";
+        $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${out.length} ${partsWord} for "${q}" (${exactCount} exact, ${suffixCount} suffix)`;
         $results.innerHTML = out.map(renderCard).join("");
         return;
     }
 
+    // Non-exact mode (original behavior): fuzzy first, then exact and alts, de-duped
     const combined = uniqByPn([...fuzzy, ...exactEq, ...pnSuffix, ...altSuffix]);
     const out = maybeFilterInStock(combined);
 
@@ -646,27 +650,54 @@
                 });
 
                 updateCart();
-                searchAndRender($in.value);
+                saveCartToStorage(); 
+// Ensure any "Go to Cart" buttons route to cart page
+document.querySelectorAll('button').forEach(function(b){
+  if (/Go to Cart/i.test(b.textContent)) {
+    b.setAttribute('onclick','goCartPage()');
+    b.onclick = function(){ goCartPage(); };
+  }
+});
+searchAndRender($in.value);
 
-                // SUCCESS TOAST anchored to the product card (top-right)
-                const card = document.getElementById(`card-${partNorm}`);
-                if (card) {
-                  if (getComputedStyle(card).position === 'static') {
-                    card.style.position = 'relative';
-                  }
-                  const note = document.createElement('div');
-                  note.className = 'inline-toast';
-                  note.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
-                  card.appendChild(note);
-                  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                  setTimeout(() => note.remove(), 2000);
-                }
+// Update the button to "Go to Cart"
+const btn = document.querySelector(`button[onclick="addToCart('${partNorm}')"]`);
+if (btn) {
+    btn.innerHTML = '<i class="fas fa-shopping-cart"></i> Go to Cart';
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.onclick = function() {
+        toggleCart();
+        document.getElementById('cart-content').scrollIntoView({ behavior: 'smooth' });
+    };
+}
+
+
+                // Success toast anchored to the product card
+const card = document.getElementById(`card-${partNorm}`);
+if (card) {
+  // make the card a positioning context
+  if (getComputedStyle(card).position === 'static') {
+    card.style.position = 'relative';
+  }
+
+  const note = document.createElement('div');
+  note.className = 'inline-toast';
+  note.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+  card.appendChild(note);
+
+  // ensure user sees it even if the card is partly off screen
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  setTimeout(() => note.remove(), 2000);
+}
+
             };
 
             window.removeFromCart = function(partNorm) {
                 cart = cart.filter(item => item.__pn_norm !== partNorm);
                 updateCart();
-            };
+            saveCartToStorage(); };
 
             window.toggleCartItemCore = function(id) {
                 const el = document.getElementById(id);
@@ -697,7 +728,7 @@
                     }
                 });
                 updateCart();
-            };
+            saveCartToStorage(); };
 
             function updateCart() {
                 if (!cart.length) {
@@ -729,16 +760,12 @@
 
                     return `
                     <div class="cart-item">
-                        <div class="cart-item-main" onclick="toggleCartItemCore('exp-${item.__pn_norm}')">
+                        <div class="cart-item-main" onclick="goCartPage()">
                             <div class="cart-item-details">
                                 <div class="cart-item-name">
                                     ${item.__pn}
                                     ${hasCore ? '<span class="cart-item-core-badge">Core</span>' : ''}
                                 </div>
-                                <div class="cart-item-desc" style="color:#4a5568;font-size:13px;margin-top:2px;">
-                                    ${item.description || '—'}
-                                </div>
-
                                 <div class="cart-item-price">${fmtMoney(item.__price_num, item.currency)} x 
                                     <input type="number" min="1" value="${item.quantity}" class="quantity-input cart-qty-input" data-norm="${item.__pn_norm}" style="width:70px; margin-left:6px;">
                                 </div>
@@ -763,6 +790,7 @@
                 $coreBadgeHeader.style.display = cart.some(x => Number(x.__core_num) > 0) ? 'inline-block' : 'none';
             }
 
+			// Payment notes (FIX #4: use $0.30 instead of colón symbol)
 			function updatePaymentNote() {
 			  const v = $paymentMethod.value;
 			  let text = '';
@@ -790,7 +818,7 @@
         alert('Please correct the highlighted customer fields.');
         return;
       }
-      const cust = saveCustomerInfo();
+      const cust = saveCustomerInfo(); // persist
 
       const payMap = {
         credit_card: 'Credit Card (+3.5% + $0.30)',
@@ -817,10 +845,6 @@
 • Company: ${cust.company || '-'}
 • Email: ${cust.email}
 • Phone: ${cust.phone}
-
-Engine:
-• Model: ${cust.engine_model || '-'}
-• Serial: ${cust.engine_serial || '-'}
 
 Ship-To:
 • ${cust.address1}${cust.address2 ? ', ' + cust.address2 : ''}
@@ -866,10 +890,21 @@ ${customerBlock}
     $in.addEventListener('keydown', (e) => { if (e.key === 'Enter') searchAndRender($in.value); });
     [$exact, $alt, $instock].forEach(el => el.addEventListener('change', () => searchAndRender($in.value)));
 
+    // Initial hint (FIX #5: only show if we did not already display "loaded")
     if (!$status.dataset.loaded) {
       $status.innerHTML = '<i class="fas fa-info-circle"></i> Type a part number (e.g., 3802010) or keyword to begin.';
     }
   })();
+  // Scroll to cart when header cart icon is clicked
+window.toggleCartAndScroll = function() {
+    toggleCart(); // toggles cart visibility
+    setTimeout(() => {
+        const cartSection = document.getElementById('cart-content');
+        if (cartSection && cartSection.style.display === 'block') {
+            cartSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, 150); // delay allows cart to open before scrolling
+}; 
   </script>
 </body>
 </html>
