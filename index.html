@@ -129,6 +129,28 @@
         .update-cart-btn { padding: 12px 20px; background: #2c3e50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; transition: .3s; }
         .update-cart-btn:hover { background: #1a202c; }
 
+        /* inline add-to-cart toast on a product card */
+        .inline-toast {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: #38a169;
+          color: #fff;
+          padding: 8px 12px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,.15);
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          z-index: 20;
+          pointer-events: none; /* don’t block clicks on the card */
+        }
+
+        /* Responsive */
+        @media (max-width:768px){
+
+
         /* Responsive */
 		@media (max-width:768px){
 		  .header h1{ font-size:2.2rem; }
@@ -503,7 +525,7 @@ const cartButtonAction = inCart
                     </div>` : '';
 
                 return `
-                <div class="result-card">
+                <div class="result-card" id="card-${r.__pn_norm}">
                     ${coreBadge}
                     ${img}
                     <div class="card-content">
@@ -634,15 +656,25 @@ if (btn) {
 }
 
 
-                // Success toast
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed; bottom: 20px; right: 20px; background: #38a169; color: white;
-                    padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
-                    z-index: 1000; animation: fadeIn .3s ease-out;`;
-                notification.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 2000);
+                // Success toast anchored to the product card
+const card = document.getElementById(`card-${partNorm}`);
+if (card) {
+  // make the card a positioning context
+  if (getComputedStyle(card).position === 'static') {
+    card.style.position = 'relative';
+  }
+
+  const note = document.createElement('div');
+  note.className = 'inline-toast';
+  note.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
+  card.appendChild(note);
+
+  // ensure user sees it even if the card is partly off screen
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  setTimeout(() => note.remove(), 2000);
+}
+
             };
 
             window.removeFromCart = function(partNorm) {
