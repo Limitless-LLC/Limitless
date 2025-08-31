@@ -1,3 +1,7 @@
+export async function onRequestGet() {
+  return new Response('checkout endpoint alive', { status: 200 });
+}
+
 // functions/api/checkout.js  — Cloudflare Pages Function
 
 const ALLOW_LIST = new Set([
