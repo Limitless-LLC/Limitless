@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Cart - Part Finder</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;line-height:1.6;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+
+/* Header */
+.header{ text-align:center; margin-bottom:30px; padding:30px 20px; background:linear-gradient(120deg,#2c3e50 0%,#3498db 100%); color:#fff; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.15); position:relative;}
+.header h1{ font-size:2.8rem; margin-bottom:10px; font-weight:700;}
+.header p{ font-size:1.2rem; opacity:.9; max-width:700px; margin:0 auto;}
+.cart-icon-header{ position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px; color:white; display:flex; align-items:center; gap:8px;}
+.core-badge-header{ position:absolute; top:50px; right:20px; background:#f39c12; color:white; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:600; display:none; }
+
+/* Navigation */
+.nav-back{ margin-bottom:20px;}
+.back-btn{ padding:12px 24px; background:#2c3e50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:.3s; text-decoration:none;}
+.back-btn:hover{ background:#1a202c; }
+
+/* Cart */
+.cart-content{ background:white; border-radius:16px; padding:25px; box-shadow:0 5px 20px rgba(0,0,0,.08);}
+.cart-items{ margin-bottom:25px; max-height:60vh; overflow-y:auto;}
+.cart-item{ border:1px solid #e2e8f0; border-radius:12px; margin-bottom:15px; overflow:hidden;}
+.cart-item-main{ display:flex; justify-content:space-between; padding:18px; align-items:center; background:#f8f9fa; cursor:pointer;}
+.cart-item-details{ flex:1;}
+.cart-item-name{ font-weight:600; margin-bottom:6px; color:#2c3e50; display:flex; align-items:center; gap:10px;}
+.cart-item-description{ color:#718096; font-size:14px; margin-bottom:8px; font-style:italic;}
+.cart-item-core-badge{ background:#f39c12; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600;}
+.cart-item-price{ color:#718096; font-size:14px; }
+.cart-item-expand{ color:#718096; font-size:14px; transition:.3s;}
+.cart-item-expand.open{ transform:rotate(180deg);}
+.cart-item-core{ padding:15px; background:#fff5f5; border-top:1px solid #fed7d7; display:none;}
+.cart-item-core-content{ display:flex; justify-content:space-between; align-items:center;}
+.cart-item-core-info{ flex:1;}
+.cart-item-core-name{ font-weight:500; margin-bottom:4px; color:#c53030;}
+.cart-item-core-desc{ color:#e53e3e; font-size:13px;}
+.cart-item-remove{ color:#e53e3e; background:none; border:none; cursor:pointer; padding:8px 16px; font-size:14px; border-radius:6px; transition:.3s;}
+.cart-item-remove:hover{ background:#fed7d7;}
+.cart-total{ font-weight:700; text-align:right; padding:20px 0; border-top:2px solid #e2e8f0; font-size:20px; color:#2c3e50;}
+
+/* Update Cart Button */
+.update-cart-btn{ padding:12px 20px; background:#2c3e50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:500; margin-bottom:20px; display:flex; align-items:center; gap:8px; transition:.3s;}
+.update-cart-btn:hover{ background:#1a202c; }
+
+/* Customer Info + Checkout */
+.customer-info-section{ background:#f8f9fa; border-radius:12px; padding:20px; margin-bottom:20px;}
+.customer-info-title{ font-size:20px; color:#2c3e50; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;}
+.customer-form{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:15px;}
+.form-group{ margin-bottom:15px;}
+.form-label{ display:block; margin-bottom:6px; font-weight:500; color:#4a5568;}
+.form-input,.form-textarea,.form-select{ width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; transition:border-color .3s;}
+.form-textarea{ min-height:80px; resize:vertical;}
+.form-required::after{ content:"*"; color:#e53e3e; margin-left:4px;}
+.form-error{ color:#e53e3e; font-size:14px; margin-top:5px; display:none;}
+.invalid{ border-color:#e53e3e !important; box-shadow:0 0 0 3px rgba(229,62,62,.15) !important; }
+
+/* Checkout */
+.checkout-section{ background:#f8f9fa; border-radius:12px; padding:20px; margin-top:20px;}
+.checkout-title{ font-size:20px; color:#2c3e50; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;}
+.checkout-instructions{ margin-bottom:15px; color:#4a5568; line-height:1.5;}
+.payment-method{ margin-bottom:15px;}
+.payment-label{ display:block; margin-bottom:6px; font-weight:500; color:#4a5568;}
+.payment-select{ width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; margin-bottom:8px;}
+.payment-note{ color:#718096; font-size:14px; font-style:italic;}
+.shipping-note{ margin-bottom:15px; padding:12px; background:#ebf8ff; border-radius:8px; color:#2b6cb0; border-left:4px solid #4299e1;}
+.compliance-notes{ margin-bottom:20px;}
+.compliance-note{ color:#718096; font-size:14px; margin-bottom:8px; padding-left:15px; position:relative;}
+.compliance-note:before{ content:"•"; position:absolute; left:0;}
+.checkout-btn{ padding:15px 30px; background:linear-gradient(120deg,#2980b9 0%,#3498db 100%); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600; font-size:16px; width:100%; transition:.3s; display:flex; align-items:center; justify-content:center; gap:10px;}
+.checkout-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(52,152,219,.4);}
+.checkout-helper{ margin-top:10px; text-align:center; color:#718096; font-size:14px;}
+
+/* Error message */
+.error-message{ background:#fed7d7; color:#c53030; padding:12px; border-radius:8px; margin-bottom:15px; display:none;}
+
+/* Responsive */
+@media (max-width:768px){
+  .header h1{ font-size:2.2rem;}
+  .header p{ font-size:1rem;}
+  .cart-item-main{ flex-direction:column; align-items:flex-start; gap:10px;}
+  .cart-icon-header{ position:relative; top:0; right:0; margin-top:15px; justify-content:center;}
+  .core-badge-header{ position:relative; top:0; right:0; margin:5px auto; width:fit-content;}
+  .customer-form{ grid-template-columns:1fr;}
+}
+
+@keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+.loading{ display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;}
+@keyframes spin{ to{ transform:rotate(360deg);} }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1><i class="fas fa-shopping-cart"></i> Your Cart</h1>
+    <p>Review your items and proceed to checkout</p>
+    <div class="cart-icon-header" id="home-button">
+      <i class="fas fa-home"></i> Back to Search
+    </div>
+    <div class="core-badge-header" id="core-badge-header">
+      <i class="fas fa-exclamation-circle"></i> Core Items
+    </div>
+  </div>
+
+  <div class="nav-back">
+    <a class="back-btn" href="index.html"><i class="fas fa-arrow-left"></i> Back to Search</a>
+  </div>
+
+  <div class="cart-content">
+    <div class="error-message" id="error-message"></div>
+    <button class="update-cart-btn" id="update-cart-button"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
+    <div class="cart-items" id="cart-items">
+      <div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>
+    </div>
+    <div class="cart-total" id="cart-total">Total: $0.00</div>
+
+    <!-- Customer Information -->
+    <div class="customer-info-section">
+      <div class="customer-info-title">Customer Information</div>
+      <div class="customer-form">
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-email">Email Address</label>
+          <input class="form-input" id="customer-email" placeholder="your.email@example.com" type="email"/>
+          <div class="form-error" id="email-error">Please enter a valid email address</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-phone">Phone Number</label>
+          <input class="form-input" id="customer-phone" placeholder="+1 470 608 3818" type="tel"/>
+          <div class="form-error" id="phone-error">Please enter a valid phone number</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="customer-company">Company Name</label>
+          <input class="form-input" id="customer-company" placeholder="Your Company Name" type="text"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-name">Full Name</label>
+          <input class="form-input" id="customer-name" placeholder="First and Last Name" type="text"/>
+          <div class="form-error" id="name-error">Please enter your name</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-address1">Address Line 1</label>
+          <input class="form-input" id="customer-address1" placeholder="Street address, P.O. box" type="text"/>
+          <div class="form-error" id="address1-error">Please enter your address</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="customer-address2">Address Line 2</label>
+          <input class="form-input" id="customer-address2" placeholder="Apartment, suite, unit, building, floor, etc." type="text"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-city">City</label>
+          <input class="form-input" id="customer-city" placeholder="City" type="text"/>
+          <div class="form-error" id="city-error">Please enter your city</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-state">State/Province/Region</label>
+          <input class="form-input" id="customer-state" placeholder="State / Province / Region" type="text"/>
+          <div class="form-error" id="state-error">Please enter your state/province</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-zip">ZIP/Postal Code</label>
+          <input class="form-input" id="customer-zip" placeholder="ZIP / Postal code" type="text"/>
+          <div class="form-error" id="zip-error">Please enter your ZIP/postal code</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label form-required" for="customer-country">Country</label>
+          <select class="form-select" id="customer-country">
+            <option value="">Select Country</option>
+            <option selected value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="MX">Mexico</option>
+            <option value="AU">Australia</option>
+            <option value="GB">United Kingdom</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="OTHER">Other</option>
+          </select>
+          <div class="form-error" id="country-error">Please select your country</div>
+        </div>
+        <div class="form-group" style="grid-column:1 / -1;">
+          <label class="form-label" for="customer-instructions">Special Instructions</label>
+          <textarea class="form-textarea" id="customer-instructions" placeholder="Any special shipping instructions or notes about your order"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="checkout-section">
+      <div class="checkout-title">How Checkout Works</div>
+      <div class="checkout-instructions">
+        The Proceed to Checkout button does not process payment—it sends your order details to Limitless so we can confirm availability, shipping, and send you a secure payment link.
+      </div>
+      <div class="payment-method">
+        <label class="payment-label" for="payment-method">Choose your preferred payment method:</label>
+        <select class="payment-select" id="payment-method">
+          <option value="">Select a payment method</option>
+          <option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
+          <option value="paypal">PayPal</option>
+          <option value="bank_wire">Bank Wire</option>
+          <option value="zelle">Zelle</option>
+          <option value="ach">ACH (U.S. only)</option>
+        </select>
+        <div class="payment-note" id="payment-note"></div>
+      </div>
+      <div class="shipping-note">
+        <strong>Shipping &amp; Handling:</strong> Calculated after we confirm weight, dimensions, and destination. You'll see the final S&amp;H on our reply email with your payment link.
+      </div>
+      <div class="compliance-notes">
+        <div class="compliance-note">• Stock &amp; Lead Time: Availability and lead times are confirmed by email before payment.</div>
+        <div class="compliance-note">• Tax: Sales tax, if applicable, is shown on your final invoice (or buyer may owe use tax).</div>
+        <div class="compliance-note">• International: Duties and import charges are paid by the consignee unless otherwise agreed.</div>
+      </div>
+      <button class="checkout-btn" id="checkout-button"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
+      <div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Make these functions globally accessible
+window.CURRENCY_FALLBACK = "USD";
+window.DECIMALS = 2;
+
+const $cartItems = document.getElementById('cart-items');
+const $cartTotal = document.getElementById('cart-total');
+const $coreBadgeHeader = document.getElementById('core-badge-header');
+const $errorMessage = document.getElementById('error-message');
+
+const $paymentMethod = document.getElementById('payment-method');
+const $paymentNote = document.getElementById('payment-note');
+
+const $customerEmail = document.getElementById('customer-email');
+const $customerPhone = document.getElementById('customer-phone');
+const $customerCompany = document.getElementById('customer-company');
+const $customerName = document.getElementById('customer-name');
+const $customerAddress1 = document.getElementById('customer-address1');
+const $customerAddress2 = document.getElementById('customer-address2');
+const $customerCity = document.getElementById('customer-city');
+const $customerState = document.getElementById('customer-state');
+const $customerZip = document.getElementById('customer-zip');
+const $customerCountry = document.getElementById('customer-country');
+const $customerInstructions = document.getElementById('customer-instructions');
+
+window.fmtMoney = (num, cur) => { 
+  const n = Number(num); 
+  if (!isFinite(n)) return String(num || ""); 
+  return `${cur || window.CURRENCY_FALLBACK} ${n.toFixed(window.DECIMALS)}`; 
+};
+
+window.esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
+  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+));
+
+// Show error message
+function showError(message) {
+  $errorMessage.textContent = message;
+  $errorMessage.style.display = 'block';
+  setTimeout(() => {
+    $errorMessage.style.display = 'none';
+  }, 5000);
+}
+
+// NEW: show payment note text based on selection
+window.setPaymentNote = function() {
+  const v = $paymentMethod.value;
+  let text = '';
+  if (v === 'credit_card') text = 'Card payments incur +3.5% + $0.30 processing.';
+  else if (v === 'paypal') text = 'PayPal payments incur +3.9% + $0.30 processing. We\'ll send a PayPal link.';
+  else if (v === 'bank_wire') text = 'Bank wire transfers incur a $25 bank fee. We\'ll email you our banking details.';
+  else if (v === 'zelle') text = 'No processing fee. We\'ll email the Zelle instructions.';
+  else if (v === 'ach') text = 'No processing fee. We\'ll email the ACH instructions.';
+  $paymentNote.textContent = text;
+};
+
+window.loadCart = function() { 
+  try { 
+    return JSON.parse(localStorage.getItem('lf_cart') || '[]'); 
+  } catch(_) { 
+    return []; 
+  } 
+};
+
+window.saveCart = function(cart) { 
+  try { 
+    localStorage.setItem('lf_cart', JSON.stringify(cart)); 
+  } catch(_){} 
+};
+
+window.renderCart = function() {
+  const cart = window.loadCart();
+  if (cart.length === 0) {
+    $cartItems.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>';
+    $cartTotal.textContent = 'Total: $0.00';
+    $coreBadgeHeader.style.display = 'none';
+    return;
+  }
+  
+  let html = '', subtotal = 0, coreTotal = 0, hasCore = false;
+  
+  // Use event delegation for better performance with many items
+  cart.forEach((item, i) => {
+    const qty = Math.max(1, parseInt(item.quantity || 1));
+    const price = Number(item.price) || 0;
+    const core = Number(item.core_charge) || 0;
+    subtotal += qty * price; 
+    coreTotal += qty * core; 
+    if (core > 0) hasCore = true;
+    
+    html += `
+      <div class="cart-item" data-index="${i}">
+        <div class="cart-item-main" data-action="toggle" data-index="${i}">
+          <div class="cart-item-details">
+            <div class="cart-item-name">${window.esc(item.part_number || item.name || 'Item')} ${core > 0 ? '<span class="cart-item-core-badge">CORE</span>' : ''}</div>
+            <div class="cart-item-description">${window.esc(item.description || '')}</div>
+            <div class="cart-item-price">
+              ${window.fmtMoney(price, item.currency)} × 
+              <input type="number" min="1" value="${qty}" data-action="updateQty" data-index="${i}" style="width:60px;padding:4px;border:1px solid #ddd;border-radius:4px">
+              = ${window.fmtMoney(qty * price, item.currency)}
+            </div>
+          </div>
+          <div class="cart-item-expand"><i class="fas fa-chevron-down"></i></div>
+        </div>
+        ${core > 0 ? `
+          <div class="cart-item-core" style="display:none;">
+            <div class="cart-item-core-content">
+              <div class="cart-item-core-info">
+                <div class="cart-item-core-name">Core Charge: ${window.fmtMoney(core, item.currency)} × ${qty}</div>
+                <div class="cart-item-core-desc">Refundable on eligible core return.</div>
+              </div>
+              <button class="cart-item-remove" data-action="remove" data-index="${i}"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+          </div>` :
+          `<div class="cart-item-core" style="display:none;">
+             <div class="cart-item-core-content">
+               <div class="cart-item-core-info"></div>
+               <button class="cart-item-remove" data-action="remove" data-index="${i}"><i class="fas fa-trash"></i> Remove</button>
+             </div>
+           </div>`}
+      </div>`;
+  });
+  
+  $cartItems.innerHTML = html;
+  $cartTotal.textContent = `Total: ${window.fmtMoney(subtotal, 'USD')}${hasCore ? ` + Core: ${window.fmtMoney(coreTotal, 'USD')}` : ''}`;
+  $coreBadgeHeader.style.display = hasCore ? 'flex' : 'none';
+};
+
+// Event delegation for better performance
+$cartItems.addEventListener('click', function(e) {
+  const target = e.target;
+  const action = target.getAttribute('data-action') || 
+                target.closest('[data-action]')?.getAttribute('data-action');
+  const index = target.getAttribute('data-index') || 
+               target.closest('[data-index]')?.getAttribute('data-index');
+  
+  if (action === 'toggle' && index !== null) {
+    window.toggleCore(parseInt(index));
+  } else if (action === 'remove' && index !== null) {
+    window.removeItem(parseInt(index));
+  }
+});
+
+$cartItems.addEventListener('change', function(e) {
+  if (e.target.getAttribute('data-action') === 'updateQty') {
+    const index = e.target.getAttribute('data-index');
+    if (index !== null) {
+      window.updateQty(parseInt(index), e.target.value);
+    }
+  }
+});
+
+window.toggleCore = function(i) {
+  const row = document.querySelector(`.cart-item[data-index="${i}"]`);
+  if (!row) return;
+  
+  const coreEl = row.querySelector('.cart-item-core');
+  const exp = row.querySelector('.cart-item-expand');
+  const open = coreEl.style.display === 'block';
+  coreEl.style.display = open ? 'none' : 'block';
+  exp.classList.toggle('open', !open);
+};
+
+window.updateQty = function(i, val) {
+  let cart = window.loadCart();
+  let q = parseInt(val); 
+  if (isNaN(q) || q < 1) q = 1;
+  if (cart[i]) cart[i].quantity = q;
+  window.saveCart(cart);
+  window.renderCart();
+};
+
+window.removeItem = function(i) {
+  let cart = window.loadCart();
+  cart.splice(i, 1);
+  window.saveCart(cart);
+  window.renderCart();
+};
+
+window.saveAndToast = function() { 
+  alert('Cart quantities updated!'); 
+};
+
+window.goHomePage = function() { 
+  window.location.href = 'index.html'; 
+};
+
+// Prefill
+(function(){
+  try {
+    const v = JSON.parse(localStorage.getItem('lf_customer_info') || 'null'); 
+    if (!v) return;
+    $customerEmail.value = v.email || ""; 
+    $customerPhone.value = v.phone || ""; 
+    $customerCompany.value = v.company || "";
+    $customerName.value = v.name || ""; 
+    $customerAddress1.value = v.address1 || ""; 
+    $customerAddress2.value = v.address2 || "";
+    $customerCity.value = v.city || ""; 
+    $customerState.value = v.state || ""; 
+    $customerZip.value = v.zip || "";
+    $customerCountry.value = v.country || "US"; 
+    $customerInstructions.value = v.instructions || "";
+  } catch(_) {}
+})();
+
+// NEW: update note immediately when user changes selection
+$paymentMethod.addEventListener('change', window.setPaymentNote);
+
+window.checkout = function() {
+  const cart = window.loadCart(); 
+  if (cart.length === 0) { 
+    showError('Your cart is empty.'); 
+    return; 
+  }
+  
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($customerEmail.value.trim());
+  if (!emailOk) { 
+    showError('Please enter a valid email.'); 
+    $customerEmail.focus(); 
+    return; 
+  }
+
+  // NEW: force payment method selection
+  const pm = $paymentMethod.value;
+  if (!pm) {
+    showError('Please select a payment method.');
+    $paymentMethod.focus();
+    return;
+  }
+
+  const subject = encodeURIComponent(`Order Request: ${cart.length} items`);
+  let body = "Order Details:\n\n", subtotal = 0, coreTotal = 0;
+  
+  // Create table-like structure for products (more concise)
+  body += "Part#".padEnd(15) + "Qty".padEnd(6) + "Price".padEnd(12) + "Core".padEnd(12) + "Description\n";
+  body += "-".repeat(60) + "\n";
+  
+  cart.forEach(item => {
+    const qty = Math.max(1, parseInt(item.quantity || 1));
+    const price = Number(item.price) || 0;
+    const core = Number(item.core_charge) || 0;
+    subtotal += qty * price; 
+    coreTotal += qty * core;
+    
+    // Format each product as a table row (more concise)
+    const partNumber = (item.part_number || "").substring(0, 14);
+    const qtyStr = qty.toString().padEnd(5);
+    const priceStr = window.fmtMoney(price, item.currency).padEnd(11);
+    const coreStr = (core > 0 ? window.fmtMoney(core, item.currency) : "-").padEnd(11);
+    const description = (item.description || "").substring(0, 30);
+    
+    body += `${partNumber.padEnd(15)}${qtyStr}${priceStr}${coreStr}${description}\n`;
+  });
+  
+  body += "\n" + "-".repeat(60) + "\n";
+  body += `Subtotal: ${window.fmtMoney(subtotal, 'USD')}\n`;
+  if (coreTotal > 0) body += `Core Total: ${window.fmtMoney(coreTotal, 'USD')}\n`;
+
+  body += `\nCustomer Information:\n`;
+  body += `Name: ${$customerName.value}\nEmail: ${$customerEmail.value}\nPhone: ${$customerPhone.value}\n`;
+  if ($customerCompany.value) body += `Company: ${$customerCompany.value}\n`;
+  body += `Address: ${$customerAddress1.value}\n`;
+  if ($customerAddress2.value) body += `Address 2: ${$customerAddress2.value}\n`;
+  body += `City: ${$customerCity.value}\nState: ${$customerState.value}\nZIP: ${$customerZip.value}\nCountry: ${$customerCountry.value}\n`;
+  if ($customerInstructions.value) body += `Instructions: ${$customerInstructions.value}\n`;
+
+  // NEW: include payment method + note in the email body (read-only, doesn't change other flows)
+  body += `\nPayment Method: ${pm}\n`;
+  if ($paymentNote.textContent) {
+    body += `Payment Note: ${$paymentNote.textContent}\n`;
+  }
+
+  const mailto = `mailto:info@limitless-llc.us?subject=${subject}&body=${encodeURIComponent(body)}`;
+  
+  // Check URL length to avoid browser limitations
+  if (mailto.length > 2000) {
+    showError('Your order is too large. Please consider splitting it into multiple orders or contact us directly.');
+    return;
+  }
+  
+  try {
+    if (window.top !== window.self) {
+      window.top.location.href = mailto;
+    } else {
+      window.location.href = mailto;
+    }
+  } catch (e) {
+    showError('Could not open email client. Please copy your order details and email us directly at info@limitless-llc.us');
+    console.error('Email error:', e);
+  }
+};
+
+// Initial render
+window.renderCart();
+// NEW: if a method is already selected (e.g., browser autofill), reflect its note
+window.setPaymentNote();
+
+// Fix for the "goHomePage is not defined" error
+document.getElementById('home-button').addEventListener('click', window.goHomePage);
+
+// Fix for the "checkout is not defined" error
+document.getElementById('checkout-button').addEventListener('click', window.checkout);
+
+// Fix for the "update-cart-button" error
+document.getElementById('update-cart-button').addEventListener('click', window.saveAndToast);
+</script>
+</body>
+</html>
