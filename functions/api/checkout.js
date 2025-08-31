@@ -34,6 +34,8 @@ export async function onRequestPost({ request }) {
     content: [{ type: 'text/plain', value: text }, { type: 'text/html', value: html }]
   };
 
+  console.log('FROM:', payload.from?.email, 'TO:', payload.personalizations?.[0]?.to?.map(t => t.email).join(','));
+
   const r = await fetch('https://api.mailchannels.net/tx/v1/send', {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload)
   });
