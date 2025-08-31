@@ -28,7 +28,7 @@ export async function onRequestPost({ request }) {
 
   const payload = {
     personalizations: [{ to: [{ email: 'info@limitless-llc.us', name: 'Limitless Orders' }] }],
-    from: { email: 'orders@limitless-llc.us', name: 'Limitless Cart' }, // set SPF/DKIM for this domain
+    from: { email: 'info@limitless-llc.us', name: 'Limitless Cart' }, // set SPF/DKIM for this domain
     reply_to: { email: customer?.email || 'info@limitless-llc.us' },
     subject,
     content: [{ type: 'text/plain', value: text }, { type: 'text/html', value: html }]
