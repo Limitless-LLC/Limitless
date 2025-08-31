@@ -638,10 +638,26 @@ window.checkout = async function() {
     });
     
     const mailtoLink = `mailto:info@limitless-llc.us?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-    window.open(mailtoLink, '_blank');
+    // Works even when embedded (Durable iframe)
+const a = document.createElement('a');
+a.href = mailtoLink;
+a.target = '_top';
+a.rel = 'noopener';
+document.body.appendChild(a);
+a.click();
+a.remove();
+
 } else {
     const mailtoLink = `mailto:info@limitless-llc.us?subject=${encodeURIComponent(data.emailData.subject)}&body=${encodeURIComponent(data.emailData.body)}`;
-    window.open(mailtoLink, '_blank');
+    // Works even when embedded (Durable iframe)
+const a = document.createElement('a');
+a.href = mailtoLink;
+a.target = '_top';
+a.rel = 'noopener';
+document.body.appendChild(a);
+a.click();
+a.remove();
+
 }
     
     showSuccess('Email client opened! Please send the email to complete your order.');
