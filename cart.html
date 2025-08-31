@@ -76,65 +76,100 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
 .checkout-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(52,152,219,.4);}
 .checkout-helper{ margin-top:10px; text-align:center; color:#718096; font-size:14px;}
 
-/* Mobile Email Fallback */
-.mobile-email-fallback {
-    background: #e8f4fd;
-    border: 1px solid #3498db;
-    border-radius: 12px;
-    padding: 20px;
+/* Multi-Option Checkout */
+.checkout-options {
+    background: #f8f9ff;
+    border: 2px solid #3498db;
+    border-radius: 16px;
+    padding: 25px;
     margin-top: 20px;
-    text-align: center;
     display: none;
+    animation: slideDown 0.3s ease-out;
 }
-.mobile-email-fallback h3 {
+.checkout-options h3 {
     color: #2c3e50;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3rem;
 }
-.mobile-email-fallback p {
+.checkout-options p {
     color: #4a5568;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    text-align: center;
     line-height: 1.5;
 }
-.email-details {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px 0;
-    text-align: left;
-    font-family: monospace;
-    font-size: 14px;
-    border: 1px solid #ddd;
+.option-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.option-btn {
+    padding: 18px 20px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    color: white;
+}
+.whatsapp-btn {
+    background: linear-gradient(120deg, #25D366 0%, #128C7E 100%);
+    border-color: #25D366;
+}
+.whatsapp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(37, 211, 102, 0.4);
+}
+.sms-btn {
+    background: linear-gradient(120deg, #007bff 0%, #0056b3 100%);
+    border-color: #007bff;
+}
+.sms-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
 }
 .copy-btn {
-    background: #27ae60;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin: 5px;
-    font-weight: 500;
-    transition: background 0.3s;
+    background: linear-gradient(120deg, #28a745 0%, #1e7e34 100%);
+    border-color: #28a745;
 }
 .copy-btn:hover {
-    background: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
 }
-.try-mailto-btn {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 12px 24px;
+.email-btn {
+    background: linear-gradient(120deg, #6c757d 0%, #495057 100%);
+    border-color: #6c757d;
+}
+.email-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(108, 117, 125, 0.4);
+}
+.download-btn {
+    background: linear-gradient(120deg, #fd7e14 0%, #e55a00 100%);
+    border-color: #fd7e14;
+}
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(253, 126, 20, 0.4);
+}
+.copied-text {
+    background: white;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    cursor: pointer;
-    margin: 10px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: background 0.3s;
-}
-.try-mailto-btn:hover {
-    background: #2980b9;
+    padding: 15px;
+    margin-top: 15px;
+    font-family: monospace;
+    font-size: 14px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
 }
 
 /* Error message */
@@ -172,11 +207,13 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
   .cart-icon-header{ position:relative; top:0; right:0; margin-top:15px; justify-content:center;}
   .core-badge-header{ position:relative; top:0; right:0; margin:5px auto; width:fit-content;}
   .customer-form{ grid-template-columns:1fr;}
-  .email-details { font-size: 12px; }
+  .option-buttons{ grid-template-columns: 1fr; }
+  .option-btn{ font-size: 15px; padding: 16px 18px; }
 }
 
 @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 @keyframes spin{ 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes slideDown{ from{opacity:0; transform:translateY(-20px);} to{opacity:1; transform:translateY(0);} }
 </style>
 </head>
 <body>
@@ -303,25 +340,41 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
       <div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
     </div>
 
-    <!-- Mobile Email Fallback -->
-    <div class="mobile-email-fallback" id="mobile-email-fallback">
-      <h3><i class="fas fa-envelope"></i> Send Email Manually</h3>
-      <p>Your device may not support automatic email opening. Please copy the information below and send it manually:</p>
+    <!-- Multi-Option Checkout -->
+    <div class="checkout-options" id="checkout-options">
+      <h3><i class="fas fa-mobile-alt"></i> Choose How to Send Your Order</h3>
+      <p>Multiple ways to submit your order. Pick the one that works best for you:</p>
       
-      <button class="try-mailto-btn" id="try-mailto-again">
-        <i class="fas fa-envelope"></i> Try Opening Email Again
-      </button>
-      
-      <div class="email-details">
-        <strong>To:</strong> info@limitless-llc.us<br>
-        <strong>Subject:</strong> <span id="email-subject"></span><br><br>
-        <strong>Message:</strong><br>
-        <div id="email-body"></div>
+      <div class="option-buttons">
+        <button class="option-btn whatsapp-btn" id="whatsapp-option">
+          <i class="fab fa-whatsapp"></i>
+          Send via WhatsApp
+        </button>
+        
+        <button class="option-btn sms-btn" id="sms-option">
+          <i class="fas fa-sms"></i>
+          Send via SMS
+        </button>
+        
+        <button class="option-btn copy-btn" id="copy-option">
+          <i class="fas fa-copy"></i>
+          Copy Details
+        </button>
+        
+        <button class="option-btn download-btn" id="download-option">
+          <i class="fas fa-download"></i>
+          Download Order
+        </button>
+        
+        <button class="option-btn email-btn" id="email-option">
+          <i class="fas fa-envelope"></i>
+          Try Email Again
+        </button>
       </div>
       
-      <button class="copy-btn" id="copy-subject">Copy Subject</button>
-      <button class="copy-btn" id="copy-body">Copy Message</button>
-      <button class="copy-btn" id="copy-all">Copy All Details</button>
+      <div class="copied-text" id="copied-text">
+        <div id="order-details-text"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -335,13 +388,16 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
 window.CURRENCY_FALLBACK = "USD";
 window.DECIMALS = 2;
 
+// Global order data for multi-option checkout
+let currentOrderData = null;
+
 const $cartItems = document.getElementById('cart-items');
 const $cartTotal = document.getElementById('cart-total');
 const $coreBadgeHeader = document.getElementById('core-badge-header');
 const $errorMessage = document.getElementById('error-message');
 const $successMessage = document.getElementById('success-message');
 const $loadingOverlay = document.getElementById('loading-overlay');
-const $mobileEmailFallback = document.getElementById('mobile-email-fallback');
+const $checkoutOptions = document.getElementById('checkout-options');
 
 const $paymentMethod = document.getElementById('payment-method');
 const $paymentNote = document.getElementById('payment-note');
@@ -358,202 +414,131 @@ const $customerZip = document.getElementById('customer-zip');
 const $customerCountry = document.getElementById('customer-country');
 const $customerInstructions = document.getElementById('customer-instructions');
 
-window.fmtMoney = (num, cur) => { 
-  const n = Number(num); 
-  if (!isFinite(n)) return String(num || ""); 
-  return `${cur || window.CURRENCY_FALLBACK} ${n.toFixed(window.DECIMALS)}`; 
-};
-
-window.esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
-  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
-));
-
-// Improved mobile detection
+// Enhanced mobile detection
 function isMobile() {
   return /iPhone|iPad|iPod|Android|BlackBerry|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) ||
-         (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
+         (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform)) ||
+         window.innerWidth <= 768;
 }
 
-// Enhanced email opening function
-function openEmailWithFallback(subject, body) {
-  const mailtoUrl = `mailto:info@limitless-llc.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// Format order data for different channels
+function formatOrderMessage(orderData, format = 'full') {
+  const customer = orderData.customer;
+  const items = orderData.items;
+  const totals = orderData.totals;
+  const payment = orderData.payment;
   
-  // Store email details for fallback
-  document.getElementById('email-subject').textContent = subject;
-  document.getElementById('email-body').textContent = body;
-  
-  // Try multiple approaches
-  let emailOpened = false;
-  
-  try {
-    if (isMobile()) {
-      // Mobile-specific approach
-      window.location.href = mailtoUrl;
-      emailOpened = true;
-    } else {
-      // Desktop approach
-      const link = document.createElement('a');
-      link.href = mailtoUrl;
-      link.target = '_self';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      emailOpened = true;
-    }
-  } catch (error) {
-    console.warn('Primary email opening failed:', error);
+  if (format === 'sms') {
+    return `NEW ORDER: ${customer.name}
+Email: ${customer.email}
+Phone: ${customer.phone || 'N/A'}
+Total: $${totals.subtotal}${totals.coreTotal > 0 ? ` + Core: $${totals.coreTotal}` : ''}
+Items: ${items.length}
+Payment: ${payment.method}
+- Full details will be emailed to info@limitless-llc.us`;
   }
   
-  // Show fallback after a delay if on mobile or if email might not have opened
-  setTimeout(() => {
-    if (isMobile() || !emailOpened) {
-      $mobileEmailFallback.style.display = 'block';
-      $mobileEmailFallback.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, isMobile() ? 1000 : 3000);
+  let message = `🛒 NEW ORDER from ${customer.name}\n\n`;
+  message += `📧 Email: ${customer.email}\n`;
+  message += `📱 Phone: ${customer.phone || 'N/A'}\n`;
+  message += `🏢 Company: ${customer.company || 'N/A'}\n\n`;
   
-  return emailOpened;
+  message += `📦 ITEMS:\n`;
+  items.forEach(item => {
+    message += `• ${item.quantity}x ${item.part_number} - $${item.price}`;
+    if (item.core_charge > 0) {
+      message += ` (Core: $${item.core_charge})`;
+    }
+    message += '\n';
+  });
+  
+  message += `\n💰 Subtotal: $${totals.subtotal}`;
+  if (totals.coreTotal > 0) {
+    message += `\n🔧 Core Charges: $${totals.coreTotal}`;
+  }
+  
+  message += `\n\n📍 SHIPPING ADDRESS:\n`;
+  message += `${customer.address1}\n`;
+  if (customer.address2) message += `${customer.address2}\n`;
+  message += `${customer.city}, ${customer.state} ${customer.zip}\n`;
+  message += `${customer.country}\n`;
+  
+  message += `\n💳 Payment Method: ${payment.method}`;
+  if (payment.note) {
+    message += `\n💡 ${payment.note}`;
+  }
+  
+  if (customer.instructions) {
+    message += `\n📝 Special Instructions: ${customer.instructions}`;
+  }
+  
+  message += `\n\n---\nGenerated by Part Finder Cart System`;
+  
+  return message;
 }
 
-// Copy to clipboard function
-async function copyToClipboard(text) {
+// Multi-option checkout functions
+function sendViaWhatsApp() {
+  const phoneNumber = "14706083818";
+  const message = formatOrderMessage(currentOrderData);
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+  showSuccess('WhatsApp opened! Please send the message to complete your order.');
+}
+
+function sendViaSMS() {
+  const phoneNumber = "14706083818";
+  const message = formatOrderMessage(currentOrderData, 'sms');
+  const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+  window.location.href = smsUrl;
+  showSuccess('SMS opened! Please send the message to complete your order.');
+}
+
+async function copyOrderDetails() {
+  const message = formatOrderMessage(currentOrderData);
+  const emailDetails = `To: info@limitless-llc.us
+Subject: Order from ${currentOrderData.customer.name}
+
+${message}`;
+  
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
+      await navigator.clipboard.writeText(emailDetails);
+      showSuccess('Order details copied to clipboard! You can now paste and send via email.');
     } else {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      const result = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      return result;
+      // Fallback: show text for manual copying
+      document.getElementById('order-details-text').textContent = emailDetails;
+      document.getElementById('copied-text').style.display = 'block';
+      showSuccess('Order details shown below - please copy and paste into your email app.');
     }
   } catch (error) {
-    console.warn('Copy to clipboard failed:', error);
-    return false;
+    // Show text for manual copying
+    document.getElementById('order-details-text').textContent = emailDetails;
+    document.getElementById('copied-text').style.display = 'block';
+    showSuccess('Order details shown below - please copy and paste into your email app.');
   }
 }
 
-// Setup copy button events
-document.getElementById('copy-subject').addEventListener('click', async () => {
-  const subject = document.getElementById('email-subject').textContent;
-  if (await copyToClipboard(subject)) {
-    showSuccess('Subject copied to clipboard!');
-  } else {
-    showError('Failed to copy subject. Please select and copy manually.');
-  }
-});
-
-document.getElementById('copy-body').addEventListener('click', async () => {
-  const body = document.getElementById('email-body').textContent;
-  if (await copyToClipboard(body)) {
-    showSuccess('Message copied to clipboard!');
-  } else {
-    showError('Failed to copy message. Please select and copy manually.');
-  }
-});
-
-document.getElementById('copy-all').addEventListener('click', async () => {
-  const subject = document.getElementById('email-subject').textContent;
-  const body = document.getElementById('email-body').textContent;
-  const fullEmail = `To: info@limitless-llc.us\nSubject: ${subject}\n\nMessage:\n${body}`;
+function downloadOrderFile() {
+  const orderData = currentOrderData;
+  const rows = [["Part Number","Qty","Unit Price","Core","Currency","Customer","Email","Phone"]];
   
-  if (await copyToClipboard(fullEmail)) {
-    showSuccess('All email details copied to clipboard!');
-  } else {
-    showError('Failed to copy details. Please select and copy manually.');
-  }
-});
-
-document.getElementById('try-mailto-again').addEventListener('click', () => {
-  const subject = document.getElementById('email-subject').textContent;
-  const body = document.getElementById('email-body').textContent;
-  const mailtoUrl = `mailto:info@limitless-llc.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoUrl;
-});
-
-// Download a CSV with the order lines so the user can attach it manually
-function downloadOrderFile(orderData, orderId) {
-  const rows = [["Part Number","Qty","Unit Price","Core","Currency"]];
-  (orderData.items || []).forEach(it => {
+  orderData.items.forEach((item, index) => {
     rows.push([
-      (it.part_number || it.name || ""),
-      String(it.quantity || 1),
-      String(Number(it.price || 0)),
-      String(Number(it.core_charge || 0)),
-      it.currency || "USD"
+      item.part_number || "",
+      String(item.quantity || 1),
+      String(item.price || 0),
+      String(item.core_charge || 0),
+      item.currency || "USD",
+      index === 0 ? orderData.customer.name : "",
+      index === 0 ? orderData.customer.email : "",
+      index === 0 ? (orderData.customer.phone || "") : ""
     ]);
   });
+  
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const fname = `order-${orderId || Date.now()}.csv`;
+  const fname = `order-${Date.now()}.csv`;
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = fname;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  return fname;
-}
-
-// Show error message
-function showError(message) {
-  $errorMessage.textContent = message;
-  $errorMessage.style.display = 'block';
-  $successMessage.style.display = 'none';
-  setTimeout(() => {
-    $errorMessage.style.display = 'none';
-  }, 5000);
-}
-
-// Show success message
-function showSuccess(message) {
-  $successMessage.textContent = message;
-  $successMessage.style.display = 'block';
-  $errorMessage.style.display = 'none';
-  setTimeout(() => {
-    $successMessage.style.display = 'none';
-  }, 5000);
-}
-
-// Show/hide loading
-function setLoading(loading) {
-  $loadingOverlay.style.display = loading ? 'flex' : 'none';
-}
-
-// NEW: show payment note text based on selection
-window.setPaymentNote = function() {
-  const v = $paymentMethod.value;
-  let text = '';
-  if (v === 'credit_card') text = 'Card payments incur +3.5% + $0.30 processing.';
-  else if (v === 'paypal') text = 'PayPal payments incur +3.9% + $0.30 processing. We\'ll send a PayPal link.';
-  else if (v === 'bank_wire') text = 'Bank wire transfers incur a $25 bank fee. We\'ll email you our banking details.';
-  else if (v === 'zelle') text = 'No processing fee. We\'ll email the Zelle instructions.';
-  else if (v === 'ach') text = 'No processing fee. We\'ll email the ACH instructions.';
-  $paymentNote.textContent = text;
-};
-
-window.loadCart = function() { 
-  try { 
-    return JSON.parse(localStorage.getItem('lf_cart') || '[]'); 
-  } catch(_) { 
-    return []; 
-  } 
-};
-
-window.saveCart = function(cart) { 
-  try { 
-    localStorage.setItem('lf_cart', JSON.stringify(cart)); 
-  } catch(_){} 
-};
-
-window.renderCart = function() {
-  const cart = window.loadCart();
+  a.download = fname
