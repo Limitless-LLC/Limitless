@@ -1,5 +1,29 @@
 // functions/api/checkout.js — Cloudflare Pages Function
-
+fetch('https://lf-cart-apl.pages.dev/api/checkout_502', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_ACTUAL_API_KEY' // ← ADD THIS
+    },
+    body: JSON.stringify({
+        totals: {
+            subtotal: 59.98,
+            coreTotal: 10.00
+        },
+        customer: {
+            email: "test@example.com",
+            name: "John Doe",
+            // ... rest of your customer data
+        },
+        payment: {
+            method: "Credit Card",
+            note: "3.5% processing fee"
+        }
+    })
+})
+.then(response => response.json())
+.then(data => console.log('Response:', data))
+.catch(error => console.error('Error:', error));
 const ALLOW_LIST = new Set([
   'https://limitless-llc.us',   // your live cart
   'https://sallamih.github.io', // if you test from GitHub Pages
