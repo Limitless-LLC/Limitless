@@ -27,14 +27,26 @@ export async function onRequestPost({ request }) {
   const { html, text } = renderEmail({ subject, items, totals, customer, payment, textBody });
 
   const payload = {
-    personalizations: [{ to: [{ email: 'info@limitless-llc.us', name: 'Limitless Orders' }] }],
-    from: { email: 'info@limitless-llc.us', name: 'Limitless Cart' }, // set SPF/DKIM for this domain
-    // Envelope sender (SPF domain checked by Domain Lockdown)
-    mail_from: { email: 'info@limitless-llc.us' },
-    reply_to: { email: customer?.email || 'info@limitless-llc.us' },
-    subject,
-    content: [{ type: 'text/plain', value: text }, { type: 'text/html', value: html }]
-  };
+  personalizations: [
+    { to: [{ email: 'info@limitless-llc.us', name: 'Limitless Orders' }] }
+  ],
+
+  // Visible From:
+  from: { email: 'info@limitless-llc.us', name: 'Limitless Cart' },
+
+  // Envelope sender (this is what Domain Lockdown checks):
+  mail_from: { email: 'info@limitless-llc.us' },
+
+  // Optional Reply-To:
+  reply_to: { email: customer?.email || 'info@limitless-llc.us' },
+
+  subject,
+  content: [
+    { type: 'text/plain', value: textBody },
+    { type: 'text/html',  value: htmlBody }
+  ]
+};
+
 
   console.log('FROM:', payload.from?.email, 'TO:', payload.personalizations?.[0]?.to?.map(t => t.email).join(','));
 
