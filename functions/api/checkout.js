@@ -1,8 +1,4 @@
 // functions/api/checkout.js  — Cloudflare Pages Function
-export async function onRequestGet() {
-  return new Response('checkout endpoint alive', { status: 200 });
-}
-
 
 const ALLOW_LIST = new Set([
   'https://limitless-llc.us',   // your live cart
