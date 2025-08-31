@@ -624,7 +624,7 @@ window.checkout = async function() {
       throw new Error(data.error || `Server error: ${response.status}`);
     }
     
-	if (!data || !data.emailData) {
+	
     if (!data || !data.emailData) {
     // Fallback: create email content manually
     const emailSubject = `Order from ${orderData.customer.name}`;
