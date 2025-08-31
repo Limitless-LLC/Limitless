@@ -1,30 +1,16 @@
-// CloudFlare Pages Function - Backend Proxy
 export async function onRequest(context) {
     const { request } = context;
     
-    // Handle CORS
-    const origin = request.headers.get('Origin') || '';
-    const ALLOW_LIST = new Set([
-        'https://limitless-llc.us',
-        'https://sallamin.github.io',
-        'http://localhost:3000',
-        'http://localhost:5000',
-        'https://your-domain.pages.dev' // Replace with your actual CloudFlare Pages domain
-    ]);
-    
-    const corsHeaders = ALLOW_LIST.has(origin) 
-        ? { 
-            'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          } 
-        : {};
+    // Handle CORS - allow all your domains
+    const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    };
 
-    // Handle preflight OPTIONS request
+    // Handle preflight OPTIONS requests
     if (request.method === 'OPTIONS') {
-        return new Response(null, {
-            headers: corsHeaders
-        });
+        return new Response(null, { headers: corsHeaders });
     }
 
     // Only allow POST requests
@@ -39,89 +25,38 @@ export async function onRequest(context) {
     }
 
     try {
-        // Get the request data from the client
-        const requestData = await request.json();
+        // Get the data from your frontend
+        const orderData = await request.json();
         
-        // Validate required fields
-        if (!requestData.totals || !requestData.customer || !requestData.payment) {
-            return new Response(JSON.stringify({ 
-                error: 'Missing required fields: totals, customer, or payment' 
-            }), {
-                status: 400,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...corsHeaders
-                }
-            });
-        }
+        console.log('Received order data:', JSON.stringify(orderData, null, 2));
 
-        // Validate customer data
-        const { customer } = requestData;
-        if (!customer.email || !customer.name || !customer.phone || !customer.address1 || 
-            !customer.city || !customer.state || !customer.zip || !customer.country) {
-            return new Response(JSON.stringify({ 
-                error: 'Missing required customer information' 
-            }), {
-                status: 400,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...corsHeaders
-                }
-            });
-        }
-
-        // Prepare data for the actual API
-        const apiData = {
-            totals: requestData.totals,
-            customer: {
-                email: customer.email,
-                name: customer.name,
-                phone: customer.phone,
-                address1: customer.address1,
-                address2: customer.address2 || '',
-                city: customer.city,
-                state: customer.state,
-                zip: customer.zip,
-                country: customer.country
-            },
-            payment: {
-                method: requestData.payment.method,
-                note: requestData.payment.note || ''
-            }
-        };
-
-        // Forward the request to the actual API with authentication
+        // Forward to the REAL API (replace with your actual API key)
         const apiResponse = await fetch('https://lf-cart-api.pages.dev/api/checkout_502', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer YOUR_ACTUAL_API_KEY' // ← REPLACE THIS WITH YOUR REAL API KEY!
+                'Authorization': 'Bearer YOUR_ACTUAL_API_KEY' // ← GET THIS FROM YOUR API PROVIDER
             },
-            body: JSON.stringify(apiData)
+            body: JSON.stringify(orderData)
         });
+
+        // Get the response from the real API
+        const responseText = await apiResponse.text();
         
-        // Check if the API response is successful
-        if (!apiResponse.ok) {
-            const errorText = await apiResponse.text();
-            console.error('API Error:', apiResponse.status, errorText);
-            
-            return new Response(JSON.stringify({ 
-                error: `API error: ${apiResponse.status}`,
-                details: errorText.substring(0, 200) // Limit response size
-            }), {
-                status: apiResponse.status,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...corsHeaders
-                }
-            });
+        console.log('API response status:', apiResponse.status);
+        console.log('API response:', responseText);
+
+        // Try to parse as JSON, if fails return text
+        let responseData;
+        try {
+            responseData = JSON.parse(responseText);
+        } catch {
+            responseData = { rawResponse: responseText };
         }
-        
-        const responseData = await apiResponse.json();
-        
-        // Return the API response to the client
+
+        // Return the API response to your frontend
         return new Response(JSON.stringify(responseData), {
-            status: 200,
+            status: apiResponse.status,
             headers: {
                 'Content-Type': 'application/json',
                 ...corsHeaders
@@ -129,10 +64,10 @@ export async function onRequest(context) {
         });
         
     } catch (error) {
-        // Handle errors
         console.error('Proxy error:', error);
         
         return new Response(JSON.stringify({ 
+            success: false,
             error: 'Internal server error',
             message: error.message 
         }), {
