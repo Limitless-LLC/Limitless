@@ -30,22 +30,17 @@ export async function onRequestPost({ request }) {
   personalizations: [
     { to: [{ email: 'info@limitless-llc.us', name: 'Limitless Orders' }] }
   ],
-
-  // Visible From:
-  from: { email: 'info@limitless-llc.us', name: 'Limitless Cart' },
-
-  // Envelope sender (this is what Domain Lockdown checks):
+  from:      { email: 'info@limitless-llc.us', name: 'Limitless Cart' },
   mail_from: { email: 'info@limitless-llc.us' },
-
-  // Optional Reply-To:
-  reply_to: { email: customer?.email || 'info@limitless-llc.us' },
+  reply_to:  { email: customer?.email || 'info@limitless-llc.us' },
 
   subject,
   content: [
-    { type: 'text/plain', value: textBody },
-    { type: 'text/html',  value: htmlBody }
+    { type: 'text/plain', value: text },
+    { type: 'text/html',  value: html }
   ]
 };
+
 
 
   console.log('FROM:', payload.from?.email, 'TO:', payload.personalizations?.[0]?.to?.map(t => t.email).join(','));
