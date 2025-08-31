@@ -37,7 +37,16 @@ export async function onRequestPost({ request }) {
   const r = await fetch('https://api.mailchannels.net/tx/v1/send', {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload)
   });
-  if (!r.ok) { const t = await r.text().catch(()=> ''); return json({ ok:false, error:`Email send failed: ${r.status} ${t}` }, 502, origin); }
+const mcText = await r.text().catch(() => '');
+console.log('MailChannels status:', r.status, mcText);
+
+if (!r.ok) {
+  return new Response(JSON.stringify({ ok: false, error: `MailChannels ${r.status}: ${mcText}` }), {
+    status: 502,
+    headers: { 'content-type': 'application/json', ...cors(origin) }
+  });
+} 
+  
 
   return json({ ok:true, orderId: randomId() }, 200, origin);
 }
