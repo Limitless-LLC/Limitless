@@ -904,9 +904,6 @@ if (typeof navigator !== "undefined" && navigator.canShare && window.File) {
   }
 }
 
-// After handling the file sharing, open the email client (show the file as attachment)
-openMailSafely(makeMailtoLink(subject, shortBodyReferencing(fname)));  // Opens the mail client with the CSV attached
-
   const shortBody =
     `Large order details saved as file: ${fname}\n\n` +
   `Please attach the downloaded file and send.\n\n` +
@@ -974,8 +971,6 @@ if (typeof navigator !== "undefined" && navigator.canShare && window.File) {
   }
 }
 
-// After handling the file sharing, open the email client (show the file as attachment)
-openMailSafely(makeMailtoLink(subject, shortBodyReferencing(fname)));  // Opens the mail client with the CSV attached
 
 	const shortBody =
      `Large order details saved as file: ${fname}\n\n` +
