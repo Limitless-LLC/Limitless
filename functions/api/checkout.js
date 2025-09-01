@@ -50,7 +50,6 @@ export async function onRequest(context) {
         emailBody += `SPECIAL INSTRUCTIONS:\n`;
         emailBody += `${orderData.customer.instructions || 'None'}\n\n`;
         
-        emailBody += `---\nThis order was received via Part Finder checkout form`;
 
         // Return the email data to frontend - frontend will open email client
         return new Response(JSON.stringify({
