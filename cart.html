@@ -421,22 +421,36 @@ function downloadOrderFile(orderData, orderId) {
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const fname = `order-${orderId || Date.now()}.csv`;
   
-  // Mobile-friendly download approach using Data URL
-  const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  // Mobile-friendly download approach
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   
-  const link = document.createElement('a');
-  link.setAttribute('href', dataUri);
-  link.setAttribute('download', fname);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
+  // Check if iOS device
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   
-  // Try/catch for mobile compatibility
-  try {
+  if (isIOS) {
+    // iOS specific handling
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      window.location.href = reader.result;
+    };
+    reader.readAsDataURL(blob);
+  } else {
+    // Standard download for other devices
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', fname);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
     link.click();
-  } catch (e) {
-    // Fallback: open in new window for mobile if click fails
-    window.open(dataUri, '_blank');
+    document.body.removeChild(link);
+    
+    // Clean up - use longer timeout for mobile
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   }
+  
+  return fname;
+}
   
   // Clean up with delay
   setTimeout(() => {
