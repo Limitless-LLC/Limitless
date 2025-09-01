@@ -420,15 +420,30 @@ function downloadOrderFile(orderData, orderId) {
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const fname = `order-${orderId || Date.now()}.csv`;
   const blob = new Blob([csv], { type: 'text/csv' });
+
+  // iOS Safari: share the file directly to Mail (or Files) if possible
+  if (typeof navigator !== "undefined" && navigator.canShare && window.File) {
+    try {
+      const file = new File([blob], fname, { type: 'text/csv' });
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: fname, text: "Order CSV attached." }).catch(()=>{});
+        return fname;
+      }
+    } catch (_) {}
+  }
+
+  // Fallback: classic "hidden link" download
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
+  a.href = url;
   a.download = fname;
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
   return fname;
 }
+
 
 // Get payment note text
 function getPaymentNoteText(paymentMethod) {
@@ -851,6 +866,19 @@ const tentative = makeMailtoLink(emailSubject, emailBody);
 if (tentative.length > 1800) {
   const orderId = Date.now();
   const fname = downloadOrderFile(orderData, orderId);
+	try {
+  const payload = new Blob([JSON.stringify(orderData)], { type: 'application/json' });  // Convert order data into JSON
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon('https://lf-cart-api.pages.dev/api/checkout', payload);  // Send data asynchronously
+  } else {
+    // Fallback to fetch if sendBeacon is not available (non-blocking)
+    fetch('https://lf-cart-api.pages.dev/api/checkout', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(orderData) 
+    }).catch(() => {});
+  }
+} catch (_) {}
   const shortBody =
     `Large order details saved as file: ${fname}\n\n` +
   `Please attach the downloaded file and send.\n\n` +
@@ -880,7 +908,20 @@ const tentative2 = makeMailtoLink(sub, bod);
 if (tentative2.length > 1800) {
   const orderId = Date.now();
   const fname = downloadOrderFile(orderData, orderId);
-  const shortBody =
+  try {
+  const payload = new Blob([JSON.stringify(orderData)], { type: 'application/json' });  // Convert order data into JSON
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon('https://lf-cart-api.pages.dev/api/checkout', payload);  // Send data asynchronously
+  } else {
+    // Fallback to fetch if sendBeacon is not available (non-blocking)
+    fetch('https://lf-cart-api.pages.dev/api/checkout', { 
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(orderData) 
+    }).catch(() => {});
+  }
+} catch (_) {}
+	const shortBody =
      `Large order details saved as file: ${fname}\n\n` +
   `Please attach the downloaded file and send.\n\n` +
   `Customer: ${orderData.customer.name}\n` +
