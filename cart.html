@@ -864,9 +864,14 @@ if (!response.ok) {
     // If mailto is too long, download CSV and send a short email
 const tentative = makeMailtoLink(emailSubject, emailBody);
 if (tentative.length > 1800) {
-  const orderId = Date.now();
-  const fname = downloadOrderFile(orderData, orderId);
-	try {
+  // Generate a unique order ID
+const orderId = Date.now();  // Generates a unique order ID based on the current timestamp
+
+// Trigger the CSV download (ensure this happens first)
+const fname = downloadOrderFile(orderData, orderId);  // This triggers the CSV download
+
+// Send the order data to the server without blocking the download
+try {
   const payload = new Blob([JSON.stringify(orderData)], { type: 'application/json' });  // Convert order data into JSON
   if (navigator.sendBeacon) {
     navigator.sendBeacon('https://lf-cart-api.pages.dev/api/checkout', payload);  // Send data asynchronously
@@ -879,6 +884,29 @@ if (tentative.length > 1800) {
     }).catch(() => {});
   }
 } catch (_) {}
+
+// Now, ensure the file can be seen by the user before opening the mail client:
+if (typeof navigator !== "undefined" && navigator.canShare && window.File) {
+  try {
+    const file = new File([new Blob([fname], { type: 'text/csv' })], fname, { type: 'text/csv' });
+    
+    if (navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: fname,
+        text: "Order CSV attached."
+      }).catch((err) => {
+        console.error("Error sharing file:", err);
+      });
+    }
+  } catch (err) {
+    console.error("Error while preparing file for sharing:", err);
+  }
+}
+
+// After handling the file sharing, open the email client (show the file as attachment)
+openMailSafely(makeMailtoLink(subject, shortBodyReferencing(fname)));  // Opens the mail client with the CSV attached
+
   const shortBody =
     `Large order details saved as file: ${fname}\n\n` +
   `Please attach the downloaded file and send.\n\n` +
@@ -906,9 +934,14 @@ if (tentative.length > 1800) {
 const bod = data.emailData.body;
 const tentative2 = makeMailtoLink(sub, bod);
 if (tentative2.length > 1800) {
-  const orderId = Date.now();
-  const fname = downloadOrderFile(orderData, orderId);
-  try {
+  // Generate a unique order ID
+const orderId = Date.now();  // Generates a unique order ID based on the current timestamp
+
+// Trigger the CSV download (ensure this happens first)
+const fname = downloadOrderFile(orderData, orderId);  // This triggers the CSV download
+
+// Send the order data to the server without blocking the download
+try {
   const payload = new Blob([JSON.stringify(orderData)], { type: 'application/json' });  // Convert order data into JSON
   if (navigator.sendBeacon) {
     navigator.sendBeacon('https://lf-cart-api.pages.dev/api/checkout', payload);  // Send data asynchronously
@@ -921,6 +954,29 @@ if (tentative2.length > 1800) {
     }).catch(() => {});
   }
 } catch (_) {}
+
+// Now, ensure the file can be seen by the user before opening the mail client:
+if (typeof navigator !== "undefined" && navigator.canShare && window.File) {
+  try {
+    const file = new File([new Blob([fname], { type: 'text/csv' })], fname, { type: 'text/csv' });
+    
+    if (navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: fname,
+        text: "Order CSV attached."
+      }).catch((err) => {
+        console.error("Error sharing file:", err);
+      });
+    }
+  } catch (err) {
+    console.error("Error while preparing file for sharing:", err);
+  }
+}
+
+// After handling the file sharing, open the email client (show the file as attachment)
+openMailSafely(makeMailtoLink(subject, shortBodyReferencing(fname)));  // Opens the mail client with the CSV attached
+
 	const shortBody =
      `Large order details saved as file: ${fname}\n\n` +
   `Please attach the downloaded file and send.\n\n` +
