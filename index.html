@@ -541,6 +541,33 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
   // Initial header sync
   syncHeader(loadCart());
 })();
+
+
+
+
+// Function to send mailto request to the parent window
+function sendMailToParent(mailtoLink) {
+  window.parent.postMessage({
+    action: "openMailto",
+    mailtoLink: mailtoLink
+  }, "*");
+}
+
+// Example: Trigger mailto when the checkout button is clicked
+document.getElementById("checkout-button").addEventListener("click", function() {
+  const emailSubject = "Order from Part Finder";
+  const emailBody = "Customer order details...";
+  const mailtoLink = `mailto:info@limitless-llc.us?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+  
+  // Send the mailto link to the parent window
+  sendMailToParent(mailtoLink);
+});
+
+
+
+
+
+  
 </script>
 </body>
 </html>
