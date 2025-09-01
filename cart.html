@@ -417,16 +417,34 @@ function downloadOrderFile(orderData, orderId) {
       it.currency || "USD"
     ]);
   });
+  
   const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const fname = `order-${orderId || Date.now()}.csv`;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = fname;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  
+  // Mobile-friendly download approach using Data URL
+  const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  
+  const link = document.createElement('a');
+  link.setAttribute('href', dataUri);
+  link.setAttribute('download', fname);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  
+  // Try/catch for mobile compatibility
+  try {
+    link.click();
+  } catch (e) {
+    // Fallback: open in new window for mobile if click fails
+    window.open(dataUri, '_blank');
+  }
+  
+  // Clean up with delay
+  setTimeout(() => {
+    if (document.body.contains(link)) {
+      document.body.removeChild(link);
+    }
+  }, 1000);
+  
   return fname;
 }
 
