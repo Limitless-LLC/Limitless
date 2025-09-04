@@ -451,14 +451,14 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
           <div class="description">${esc(p.description || '')}</div>
           <div class="chips">
             <span class="chip price"><i class="fas fa-tag"></i> ${fmtMoney(p.__price_num, p.currency)}</span>
-            <span class="chip stock"><i class="fas fa-box"></i> ${p.__stock_num>0? (p.__stock_num+' in stock'):'Out of stock'}</span>
+            <span class="chip stock"><i class="fas fa-clock"></i> Lead Time: 2–8 Days</span>
             ${isCore ? `<span class="chip core"><i class="fas fa-exclamation-circle"></i> Core: ${fmtMoney(p.__core_num, p.currency)}</span>` : ''}
           </div>
           ${p.__alts.length ? `<div class="alt-pns"><strong>Alternates:</strong> ${esc(p.__alts.join(', '))}</div>` : ''}
           <div class="quantity-control">
             <span class="quantity-label">Quantity:</span>
             <button class="qty-btn" id="minus-${sid}" type="button">−</button>
-            <input type="number" class="quantity-input" id="qty-${sid}" value="${qtyInCart}" min="1" max="${p.__stock_num>0?p.__stock_num:9999}"/>
+            <input type="number" class="quantity-input" id="qty-${sid}" value="${qtyInCart}" min="1" max="9999"/>
             <button class="qty-btn" id="plus-${sid}" type="button">+</button>
           </div>
           <div class="action-buttons">
@@ -510,7 +510,7 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
     }
 
     if ($instock.checked){ 
-      results = results.filter(r => r.item.__stock_num > 0); 
+      results = results; 
     }
     
     results.sort((a,b)=>(a.score||0)-(b.score||0));
