@@ -1,152 +1,84 @@
 // functions/api/checkout.js
 export async function onRequest(context) {
-  const { request } = context;
-
-  // --- CORS ---
-  const corsHeaders = {
-    // For stricter security, set this to your site origin: 'https://limitless-llc.us'
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
-  };
-
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders }
-    });
-  }
-
-  try {
-    const orderData = await request.json();
-    const now = Date.now();
-    const orderId = `ORD-${now}`;
-
-    const customer = orderData.customer || {};
-    const items = Array.isArray(orderData.items) ? orderData.items : [];
-    const totals = orderData.totals || { subtotal: 0, coreTotal: 0 };
-
-    const toAddress =
-      (orderData.email && orderData.email.to) || 'info@limitless-llc.us';
-    const ccList =
-      (orderData.email && Array.isArray(orderData.email.cc) && orderData.email.cc.filter(Boolean)) || [];
-
-    const subject =
-      orderData.subject ||
-      `New Order from ${customer.name || 'Customer'} — ${orderId}`;
-
-    // Build bodies if frontend didn't send them
-    const textBody =
-      orderData.textBody ||
-      buildTextEmail({ orderId, customer, items, totals, payment: orderData.payment });
-
-    const htmlBody =
-      orderData.htmlBody ||
-      `<pre style="font-family:Segoe UI,Tahoma,Arial,sans-serif">${escapeHtml(textBody)}</pre>`;
-
-    // --- Send email via MailChannels ---
-    const mailPayload = {
-      personalizations: [
-        {
-          to: [{ email: toAddress }],
-          ...(ccList.length ? { cc: ccList.map(e => ({ email: e })) } : {})
-        }
-      ],
-      from: { email: 'no-reply@limitless-llc.us', name: 'Limitless Cart' },
-      ...(customer.email
-        ? { reply_to: { email: customer.email, name: customer.name || 'Customer' } }
-        : {}),
-      subject,
-      content: [
-        { type: 'text/plain', value: textBody },
-        { type: 'text/html', value: htmlBody }
-      ]
+    const { request } = context;
+    
+    const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
     };
 
-    const mailRes = await fetch('https://api.mailchannels.net/tx/v1/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(mailPayload)
-    });
-
-    if (!mailRes.ok) {
-      const errText = await mailRes.text();
-      console.error('MailChannels error:', errText);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Email send failed',
-        details: errText
-      }), { status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    if (request.method === 'OPTIONS') {
+        return new Response(null, { headers: corsHeaders });
     }
 
-    // Success
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Email sent',
-      orderId
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders }
-    });
+    try {
+        const orderData = await request.json();
+        
+        console.log('📦 Order received:', orderData);
+        
+        // Prepare email content
+        const emailSubject = `New Order from ${orderData.customer.name} - Order #ORD-${Date.now()}`;
+        
+        let emailBody = `NEW ORDER RECEIVED!\n\n`;
+        emailBody += `Order ID: ORD-${Date.now()}\n`;
+        emailBody += `Customer: ${orderData.customer.name}\n`;
+        emailBody += `Email: ${orderData.customer.email}\n`;
+        emailBody += `Phone: ${orderData.customer.phone}\n`;
+        emailBody += `Company: ${orderData.customer.company || 'None'}\n\n`;
+        
+        emailBody += `ORDER TOTALS:\n`;
+        emailBody += `Subtotal: $${orderData.totals.subtotal}\n`;
+        emailBody += `Core Charge: $${orderData.totals.coreTotal}\n`;
+        emailBody += `Total: $${orderData.totals.subtotal + orderData.totals.coreTotal}\n\n`;
+        
+        emailBody += `ITEMS (${orderData.items.length}):\n`;
+        orderData.items.forEach(item => {
+            emailBody += `- ${item.quantity}x ${item.part_number || item.name} - $${item.price} each\n`;
+        });
+        emailBody += `\n`;
+        
+        emailBody += `SHIPPING ADDRESS:\n`;
+        emailBody += `${orderData.customer.address1}\n`;
+        if (orderData.customer.address2) emailBody += `${orderData.customer.address2}\n`;
+        emailBody += `${orderData.customer.city}, ${orderData.customer.state} ${orderData.customer.zip}\n`;
+        emailBody += `${orderData.customer.country}\n\n`;
+        
+        emailBody += `PAYMENT METHOD: ${orderData.payment.method}\n`;
+        emailBody += `PAYMENT NOTE: ${orderData.payment.note || 'None'}\n\n`;
+        
+        emailBody += `SPECIAL INSTRUCTIONS:\n`;
+        emailBody += `${orderData.customer.instructions || 'None'}\n\n`;
+        
 
-  } catch (error) {
-    console.error('Checkout error:', error);
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'Internal server error',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders }
-    });
-  }
-}
-
-// ---------- helpers ----------
-function fmt2(n) { return Number(n || 0).toFixed(2); }
-
-function buildTextEmail({ orderId, customer, items, totals, payment }) {
-  const lines = [];
-  lines.push(`NEW ORDER RECEIVED!`);
-  lines.push(`Order ID: ${orderId}`);
-  lines.push('');
-  lines.push(`Customer: ${customer.name || ''}`);
-  lines.push(`Email: ${customer.email || ''}`);
-  if (customer.phone) lines.push(`Phone: ${customer.phone}`);
-  lines.push(`Company: ${customer.company || 'None'}`);
-  lines.push('');
-  lines.push(`ORDER TOTALS:`);
-  lines.push(`Subtotal: $${fmt2(totals.subtotal)}`);
-  lines.push(`Core Charge: $${fmt2(totals.coreTotal)}`);
-  lines.push(`Total: $${fmt2((totals.subtotal || 0) + (totals.coreTotal || 0))}`);
-  lines.push('');
-  lines.push(`ITEMS (${items.length}):`);
-  items.forEach(item => {
-    lines.push(`- ${item.quantity}x ${item.part_number || item.name} — $${fmt2(item.price)} each`);
-  });
-  lines.push('');
-  lines.push(`SHIPPING ADDRESS:`);
-  if (customer.address1) lines.push(customer.address1);
-  if (customer.address2) lines.push(customer.address2);
-  if (customer.city || customer.state || customer.zip) {
-    lines.push(`${customer.city || ''}, ${customer.state || ''} ${customer.zip || ''}`.trim());
-  }
-  if (customer.country) lines.push(customer.country);
-  lines.push('');
-  lines.push(`PAYMENT METHOD: ${payment?.method || 'N/A'}`);
-  if (payment?.note) lines.push(`PAYMENT NOTE: ${payment.note}`);
-  lines.push('');
-  lines.push(`SPECIAL INSTRUCTIONS:`);
-  lines.push(`${customer.instructions || 'None'}`);
-  return lines.join('\n');
-}
-
-function escapeHtml(s) {
-  return (s ?? '').toString().replace(/[&<>"']/g, c => (
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])
-  ));
+        // Return the email data to frontend - frontend will open email client
+        return new Response(JSON.stringify({
+            success: true,
+            message: "Ready to send email",
+            emailData: {
+                to: "info@limitless-llc.us",
+                subject: emailSubject,
+                body: emailBody
+            }
+        }), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                ...corsHeaders
+            }
+        });
+        
+    } catch (error) {
+        return new Response(JSON.stringify({ 
+            success: false,
+            error: 'Internal server error',
+            message: error.message 
+        }), {
+            status: 500,
+            headers: {
+                'Content-Type': 'application/json',
+                ...corsHeaders
+            }
+        });
+    }
 }
