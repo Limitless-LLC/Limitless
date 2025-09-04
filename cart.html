@@ -297,8 +297,18 @@ window.renderCart = function(){
 
 // ====== Navigation ======
 window.goHomePage = function(){
-  // Navigate back to your Part Finder page
-  window.location.href = 'https://limitless-llc.us/partfinder';
+  const url = 'https://limitless-llc.us/partfinder';
+  try {
+    if (window.top && window.top !== window) {
+      // try to navigate the top frame (Durable embeds often sandbox navigation)
+      window.top.location.href = url;
+      return;
+    }
+  } catch(e) {
+    // fall through
+  }
+  // final fallback: open a new tab so the user definitely gets there
+  window.open(url, '_blank');
 };
 
 // ====== Form bindings & persistence ======
@@ -563,6 +573,11 @@ function getPaymentNoteText(pm){
 
 // Initial render
 window.renderCart();
+
+// Re-render when returning from Part Finder or another tab
+window.addEventListener('visibilitychange', ()=>{ if(!document.hidden) window.renderCart(); });
+window.addEventListener('focus', ()=> window.renderCart());
+window.addEventListener('storage', (e)=>{ if(e.key==='lf_cart') window.renderCart(); });
 // NEW: if a method is already selected (e.g., browser autofill), reflect its note
 window.setPaymentNote();
 
