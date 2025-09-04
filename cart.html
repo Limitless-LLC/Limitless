@@ -191,11 +191,10 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
 const DECIMALS = 2;
 const CURRENCY_FALLBACK = 'USD';
 
-window.fmtMoney = (num, cur) => { 
-  const n = Number(num); 
-  if (!isFinite(n)) return String(num || ""); 
-  return `${cur || window.CURRENCY_FALLBACK} ${n.toFixed(window.DECIMALS)}`; 
-};
+window.fmtMoney = (num, cur) => { const n = Number(num); if (!isFinite(n)) return String(num ?? ""); return `${cur || CURRENCY_FALLBACK} ${n.toFixed(DECIMALS)}`; };
+// expose for any legacy calls
+window.CURRENCY_FALLBACK = CURRENCY_FALLBACK;
+window.DECIMALS = DECIMALS;
 
 window.esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
   {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
@@ -385,6 +384,73 @@ function showValidationPopup(list){
 }
 function hideValidationPopup(){ $validationPopup.style.display='none'; }
 
+// ====== Email builders ======
+function buildEmailHTML(o){
+  const rows = (o.items||[]).map(it=>
+    `<tr><td style="padding:6px 8px;border:1px solid #e2e8f0;">${esc(it.part_number)}</td>`+
+    `<td style="padding:6px 8px;border:1px solid #e2e8f0;">${esc(it.description||'')}</td>`+
+    `<td style=\"padding:6px 8px;border:1px solid #e2e8f0;text-align:right;\">${it.quantity||1}</td>`+
+    `<td style=\"padding:6px 8px;border:1px solid #e2e8f0;text-align:right;\">${esc(fmtMoney(it.price,it.currency))}</td>`+
+    `<td style=\"padding:6px 8px;border:1px solid #e2e8f0;text-align:right;\">${esc(fmtMoney(it.core_charge||0,it.currency))}</td></tr>`
+  ).join("");
+  return `
+  <div style="font-family:Segoe UI,Tahoma,Arial,sans-serif;font-size:14px;color:#2d3748;">
+    <h2 style="margin:0 0 8px;">New RFQ</h2>
+    <p style="margin:0 0 12px;">Customer <strong>${esc(o.customer.name||'')}</strong> (${esc(o.customer.company||'')}) requested a quote.</p>
+    <h3 style="margin:14px 0 6px;">Items</h3>
+    <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:6px 8px;border:1px solid #e2e8f0;">Part #</th>
+          <th style="text-align:left;padding:6px 8px;border:1px solid #e2e8f0;">Description</th>
+          <th style="text-align:right;padding:6px 8px;border:1px solid #e2e8f0;">Qty</th>
+          <th style="text-align:right;padding:6px 8px;border:1px solid #e2e8f0;">Price</th>
+          <th style="text-align:right;padding:6px 8px;border:1px solid #e2e8f0;">Core</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <h3 style="margin:14px 0 6px;">Totals</h3>
+    <p style="margin:0;">Subtotal: <strong>${esc(fmtMoney(o.totals.subtotal))}</strong></p>
+    <p style="margin:0;">Core: <strong>${esc(fmtMoney(o.totals.coreTotal))}</strong></p>
+    <p style="margin:0 0 12px;">Total: <strong>${esc(fmtMoney(o.totals.subtotal + o.totals.coreTotal))}</strong></p>
+    <h3 style="margin:14px 0 6px;">Customer</h3>
+    <p style="margin:0;">${esc(o.customer.name||'')} — ${esc(o.customer.company||'')}</p>
+    <p style="margin:0;">${esc(o.customer.email||'')} ${o.customer.phone?(' / '+esc(o.customer.phone)) : ''}</p>
+    <p style="margin:0;">${esc(o.customer.address1||'')} ${esc(o.customer.address2||'')}</p>
+    <p style="margin:0;">${esc(o.customer.city||'')}, ${esc(o.customer.state||'')} ${esc(o.customer.zip||'')} — ${esc(o.customer.country||'')}</p>
+    ${o.customer.engineModel||o.customer.engineSerial?(`<p style="margin:0;">Engine: ${esc(o.customer.engineModel||'')} ${esc(o.customer.engineSerial||'')}</p>`):''}
+    ${o.customer.instructions?(`<p style="margin:8px 0 0;"><em>${esc(o.customer.instructions)}</em></p>`):''}
+    <h3 style="margin:14px 0 6px;">Payment</h3>
+    <p style="margin:0;">${esc(o.payment.method)} — ${esc(o.payment.note||'')}</p>
+  </div>`;
+}
+function buildTextEmail(o){
+  const lines = [];
+  lines.push(`RFQ from ${o.customer.name||''} (${o.customer.company||''})`);
+  lines.push('');
+  lines.push('Items:');
+  (o.items||[]).forEach(it=>{
+    lines.push(`- ${it.part_number} | ${it.description||''} | Qty ${it.quantity} | ${fmtMoney(it.price,it.currency)} | Core ${fmtMoney(it.core_charge||0,it.currency)}`);
+  });
+  lines.push('');
+  lines.push(`Subtotal: ${fmtMoney(o.totals.subtotal)}`);
+  lines.push(`Core: ${fmtMoney(o.totals.coreTotal)}`);
+  lines.push(`Total: ${fmtMoney(o.totals.subtotal + o.totals.coreTotal)}`);
+  lines.push('');
+  lines.push('Customer:');
+  lines.push(`${o.customer.name||''} — ${o.customer.company||''}`);
+  lines.push(`${o.customer.email||''} ${o.customer.phone?('/ '+o.customer.phone):''}`);
+  lines.push(`${o.customer.address1||''} ${o.customer.address2||''}`);
+  lines.push(`${o.customer.city||''}, ${o.customer.state||''} ${o.customer.zip||''} — ${o.customer.country||''}`);
+  if(o.customer.engineModel||o.customer.engineSerial){ lines.push(`Engine: ${o.customer.engineModel||''} ${o.customer.engineSerial||''}`);} 
+  if(o.customer.instructions){ lines.push(`Instructions: ${o.customer.instructions}`);} 
+  lines.push('');
+  lines.push(`Payment: ${o.payment.method} — ${o.payment.note||''}`);
+  return lines.join('
+');
+}
+
 // ====== Checkout ======
 window.checkout = async function(){
   const cart = window.loadCart();
@@ -456,7 +522,13 @@ window.checkout = async function(){
   }))
 };
 
-    // Send to backend
+    // Build subject/body for common CF worker patterns
+const subject = `RFQ — ${orderData.customer.name || 'Customer'} — ${orderData.items.length} item(s)`;
+orderData.subject = subject;
+orderData.htmlBody = buildEmailHTML(orderData);
+orderData.textBody = buildTextEmail(orderData);
+
+// Send to backend
     const response = await fetch('https://lf-cart-api.pages.dev/api/checkout', {
       method: 'POST',
       headers: {
@@ -471,7 +543,9 @@ try { data = JSON.parse(raw); } catch { data = null; }
 
 if (!response.ok) {
   const serverMsg = (data && (data.error || data.message)) || raw || `Server error: ${response.status}`;
-  throw new Error(serverMsg);
+  console.error('Checkout API error:', serverMsg);
+  showError(serverMsg);
+  return;
 }
 
 showSuccess('Order submitted! We emailed info@limitless-llc.us and CC’d you. Please check your inbox.');
