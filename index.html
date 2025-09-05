@@ -159,7 +159,7 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
     {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
   ));
 
-  // ---- Cart helpers with consistent storage ----
+  // ---- Cart helpers with consistent storage  ----
   const loadCart = () => { 
     try { 
       return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]'); 
