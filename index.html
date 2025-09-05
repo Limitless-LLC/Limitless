@@ -1,233 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline'; connect-src *; frame-src *;">
-    <title>Parts Finder - Limitless LLC</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;line-height:1.6;min-height:100vh}
-        .container{max-width:1200px;margin:0 auto;padding:20px}
+  <meta charset="utf-8"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline'; connect-src *; frame-src *;">
+  <title>Parts Finder - Limitless LLC</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;line-height:1.6;min-height:100vh}
+    .container{max-width:1200px;margin:0 auto;padding:20px}
 
-        /* Header */
-        .header{ text-align:center; margin-bottom:30px; padding:30px 20px; background:linear-gradient(120deg,#2c3e50 0%,#3498db 100%); color:#fff; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.15); position:relative;}
-        .header h1{ font-size:2.8rem; margin-bottom:10px; font-weight:700;}
-        .header p{ font-size:1.2rem; opacity:.9; max-width:700px; margin:0 auto;}
-        .cart-icon-header{ position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px; color:white; display:flex; align-items:center; gap:8px;}
-        .cart-count{ background:#e74c3c; color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold;}
+    /* Header */
+    .header{ text-align:center; margin-bottom:30px; padding:30px 20px; background:linear-gradient(120deg,#2c3e50 0%,#3498db 100%); color:#fff; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.15); position:relative;}
+    .header h1{ font-size:2.8rem; margin-bottom:10px; font-weight:700;}
+    .header p{ font-size:1.2rem; opacity:.9; max-width:700px; margin:0 auto;}
+    .cart-icon-header{ position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px; color:white; display:flex; align-items:center; gap:8px;}
+    .cart-count{ background:#e74c3c; color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold;}
+    .core-badge-header{ position:absolute; top:50px; right:20px; background:#f39c12; color:white; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:600; display:none; }
 
-        /* Search Section */
-        .search-section{ background:white; border-radius:16px; padding:30px; box-shadow:0 5px 20px rgba(0,0,0,.08); margin-bottom:30px;}
-        .search-box{ display:flex; gap:15px; margin-bottom:25px; flex-wrap:wrap;}
-        .search-input{ flex:1; min-width:300px; padding:18px 22px; border:2px solid #e2e8f0; border-radius:12px; font-size:16px; transition:.3s; box-shadow:0 2px 5px rgba(0,0,0,.05);}
-        .search-input:focus{ border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,.2); outline:none;}
-        .search-btn{ padding:18px 32px; background:linear-gradient(120deg,#2980b9 0%,#3498db 100%); color:white; border:none; border-radius:12px; cursor:pointer; font-size:16px; font-weight:600; transition:.3s; box-shadow:0 4px 8px rgba(52,152,219,.3);}
-        .search-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(52,152,219,.4);}
+    /* Search */
+    .search-section{ background:white; border-radius:16px; padding:30px; box-shadow:0 5px 20px rgba(0,0,0,.08); margin-bottom:30px;}
+    .search-box{ display:flex; gap:15px; margin-bottom:25px; flex-wrap:wrap;}
+    .search-input{ flex:1; min-width:300px; padding:18px 22px; border:2px solid #e2e8f0; border-radius:12px; font-size:16px; transition:.3s; box-shadow:0 2px 5px rgba(0,0,0,.05);}
+    .search-input:focus{ border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,.2); outline:none;}
+    .search-btn{ padding:18px 32px; background:linear-gradient(120deg,#2980b9 0%,#3498db 100%); color:white; border:none; border-radius:12px; cursor:pointer; font-size:16px; font-weight:600; transition:.3s; box-shadow:0 4px 8px rgba(52,152,219,.3);}
+    .search-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(52,152,219,.4);}
 
-        /* Filters */
-        .filters{ display:flex; gap:25px; flex-wrap:wrap; margin-bottom:20px; padding:20px; background:#f8f9fa; border-radius:12px;}
-        .filter-item{ display:flex; align-items:center; gap:10px;}
-        .filter-item input{ width:20px; height:20px; cursor:pointer;}
-        .filter-item label{ font-weight:500; cursor:pointer;}
+    /* Filters */
+    .filters{ display:flex; gap:25px; flex-wrap:wrap; margin-bottom:20px; padding:20px; background:#f8f9fa; border-radius:12px;}
+    .filter-item{ display:flex; align-items:center; gap:10px;}
+    .filter-item input{ width:20px; height:20px; cursor:pointer;}
+    .filter-item label{ font-weight:500; cursor:pointer;}
 
-        /* Results */
-        .results-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:25px; margin-bottom:40px;}
-        .result-card{ border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,.08); transition:.3s; background:white; display:flex; flex-direction:column; position:relative;}
-        .result-card:hover{ transform:translateY(-5px); box-shadow:0 12px 20px rgba(0,0,0,.15);}
-        .card-image{ display:flex; align-items:center; justify-content:center; height:220px; border-bottom:1px solid #f1f1f1; background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);}
-        .card-image img{ max-width:85%; max-height:200px; object-fit:contain;}
-        .card-content{ padding:20px; flex-grow:1; display:flex; flex-direction:column;}
-        .part-number{ font-weight:700; margin-bottom:8px; font-size:18px; color:#2c3e50;}
-        .brand-uom{ font-size:14px; color:#718096; margin-bottom:12px;}
-        .description{ font-size:14px; color:#4a5568; margin-bottom:15px; flex-grow:1;}
-        .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px;}
-        .chip{ display:inline-block; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:500;}
-        .chip.price{ background:#ebf8ff; color:#2b6cb0; border:1px solid #bee3f8;}
-        .chip.stock{ background:#f0fff4; color:#2f855a; border:1px solid #c6f6d5;}
-        .chip.core{ background:#fff5f5; color:#c53030; border:1px solid #fed7d7;}
-        .alt-pns{ margin-top:12px; font-size:13px; color:#718096;}
-        .quantity-control{ display:flex; align-items:center; margin:15px 0; gap:10px;}
-        .quantity-label{ font-weight:500; color:#4a5568;}
-        .quantity-input{ width:70px; padding:8px 12px; border:1px solid #ddd; border-radius:6px; text-align:center;}
-        .qty-btn{ width:36px; height:36px; border:1px solid #ddd; background:white; border-radius:8px; cursor:pointer; font-weight:700;}
-        .qty-btn:active{ transform:scale(.97)}
+    /* Status */
+    .status{ padding:15px 0; color:4a5568; min-height:24px; display:flex; align-items:center; gap:10px;}
 
-        /* Cart Section */
-        .cart-section{ background:white; border-radius:16px; padding:30px; box-shadow:0 5px 20px rgba(0,0,0,.08); margin-top:30px;}
-        .cart-header{ margin-bottom:20px;}
-        .cart-items{ margin-bottom:20px;}
-        .cart-total{ font-weight:700; font-size:18px;}
+    /* Results */
+    .results-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:25px; margin-bottom:40px;}
+    .result-card{ border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,.08); transition:.3s; background:white; display:flex; flex-direction:column; position:relative; animation:fadeIn .5s ease-out;}
+    .result-card:hover{ transform:translateY(-5px); box-shadow:0 12px 20px rgba(0,0,0,.15);}
+    .core-badge{ position:absolute; top:15px; right:15px; background:#f39c12; color:white; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:600; z-index:10; box-shadow:0 2px 5px rgba(0,0,0,.2); display:flex; align-items:center; gap:5px;}
+    .card-image{ display:flex; align-items:center; justify-content:center; height:220px; border-bottom:1px solid #f1f1f1; background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);}
+    .card-image img{ max-width:85%; max-height:200px; object-fit:contain;}
+    .card-content{ padding:20px; flex-grow:1; display:flex; flex-direction:column;}
+    .part-number{ font-weight:700; margin-bottom:8px; font-size:18px; color:#2c3e50;}
+    .brand-uom{ font-size:14px; color:#718096; margin-bottom:12px;}
+    .description{ font-size:14px; color:#4a5568; margin-bottom:15px; flex-grow:1;}
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px;}
+    .chip{ display:inline-block; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:500;}
+    .chip.price{ background:#ebf8ff; color:#2b6cb0; border:1px solid #bee3f8;}
+    .chip.stock{ background:#f0fff4; color:#2f855a; border:1px solid #c6f6d5;}
+    .chip.core{ background:#fff5f5; color:#c53030; border:1px solid #fed7d7;}
+    .alt-pns{ margin-top:12px; font-size:13px; color:#718096;}
+    .quantity-control{ display:flex; align-items:center; margin:15px 0; gap:10px;}
+    .quantity-label{ font-weight:500; color:#4a5568;}
+    .quantity-input{ width:70px; padding:8px 12px; border:1px solid #ddd; border-radius:6px; text-align:center;}
+    .qty-btn{ width:36px; height:36px; border:1px solid #ddd; background:white; border-radius:8px; cursor:pointer; font-weight:700;}
+    .qty-btn:active{ transform:scale(.97)}
 
-        /* Checkout Section */
-        .customer-info-section{ margin-top:20px; border-top:2px solid #e2e8f0; padding-top:20px;}
-        .form-input{ padding:12px; border-radius:8px; border:1px solid #ddd; font-size:16px;}
-        .checkout-btn{ padding:12px 24px; background:#2c3e50; color:white; border-radius:8px; cursor:pointer; font-weight:600;}
-    </style>
+    .action-buttons{ display:flex; gap:12px; margin-top:10px;}
+    .action-btn{ flex:1; text-align:center; text-decoration:none; padding:12px; border-radius:10px; font-weight:500; transition:.3s; display:flex; align-items:center; justify-content:center; gap:8px; border:none; cursor:pointer;}
+    .cart-btn{ background:#2c3e50; color:white; border:2px solid #2c3e50;}
+    .cart-btn:hover{ background:#1a202c;}
+    .cart-btn.update{ background:#2563eb; border-color:#2563eb;}
+    .cart-btn.in-cart{ background:#38a169; border-color:#38a169;}
+    .whatsapp-btn{ background:white; color:#25D366; border:2px solid #25D366;}
+    .whatsapp-btn:hover{ background:#25D366; color:white;}
+    .inline-action{ margin-top:8px; display:flex; justify-content:flex-end; }
+    .remove-link{ background:none; border:none; color:#e53e3e; cursor:pointer; font-size:13px; text-decoration:underline; }
+
+    .empty-cart{ text-align:center; padding:40px; color:#718096; font-size:18px; }
+    .empty-cart i{ font-size:48px; margin-bottom:15px; opacity:0.5; }
+
+    /* Responsive */
+    @media (max-width:768px){
+      .header h1{ font-size:2.2rem;}
+      .header p{ font-size:1rem;}
+      .search-box{ flex-direction:column;}
+      .search-input,.search-btn{ width:100%;}
+      .filters{ flex-direction:column; gap:15px;}
+      .results-grid{ grid-template-columns:1fr;}
+      .action-buttons{ flex-direction:column;}
+      .cart-item-main{ flex-direction:column; align-items:flex-start; gap:10px;}
+      .cart-icon-header{ position:relative; top:0; right:0; margin-top:15px; justify-content:center;}
+      .core-badge-header{ position:relative; top:0; right:0; margin:5px auto; width:fit-content;}
+    }
+
+    /* Animations */
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    .loading{ display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;}
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
     <!-- Header Section -->
     <div class="header">
-        <h1><i class="fas fa-search"></i> Part Finder</h1>
-        <p>Search our extensive inventory of diesel engine parts</p>
-        <div class="cart-icon-header" onclick="goToCart()">
-            <i class="fas fa-shopping-cart"></i>
-            <div class="cart-count" id="cart-count">0</div>
-        </div>
+      <h1><i class="fas fa-search"></i> Part Finder</h1>
+      <p>Search our extensive inventory of diesel engine parts</p>
+      <div class="cart-icon-header" onclick="goCartPage()">
+        <i class="fas fa-shopping-cart"></i>
+        <div class="cart-count" id="cart-count">0</div>
+      </div>
+      <div class="core-badge-header" id="core-badge-header">
+        <i class="fas fa-exclamation-circle"></i> Core Items
+      </div>
     </div>
 
-    <!-- Search Section -->
     <div class="search-section">
-        <div class="search-box">
-            <input class="search-input" id="lf-input" placeholder="Enter part number, description, or keyword..."/>
-            <button class="search-btn" id="lf-btn"><i class="fas fa-search"></i> Search</button>
-        </div>
-        <div class="filters">
-            <div class="filter-item"><input id="lf-exact" type="checkbox"/><label for="lf-exact">Exact Match</label></div>
-            <div class="filter-item"><input id="lf-alt" type="checkbox" checked/><label for="lf-alt">Include Alternate Parts</label></div>
-            <div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
-        </div>
-        <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
+      <div class="search-box">
+        <input class="search-input" id="lf-input" placeholder="Enter part number, description, or keyword..."/>
+        <button class="search-btn" id="lf-btn"><i class="fas fa-search"></i> Search</button>
+      </div>
+
+      <div class="filters">
+        <div class="filter-item"><input id="lf-exact" type="checkbox"/><label for="lf-exact">Exact Match</label></div>
+        <div class="filter-item"><input id="lf-alt" type="checkbox" checked/><label for="lf-alt">Include Alternate Parts</label></div>
+        <div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
+      </div>
+
+      <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
     </div>
 
-    <!-- Results Section -->
     <div class="results-grid" id="lf-results"></div>
+  </div>
 
-    <!-- Cart Section -->
-    <div class="cart-section" id="cart-section">
-        <div class="cart-header">
-            <h2>Your Cart</h2>
-            <div class="cart-items" id="cart-items"></div>
-            <div class="cart-total" id="cart-total">Total: $0.00</div>
-        </div>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <script>
+    const CSV_URL = "https://yourcatalogurl.com/parts_catalog_template.csv"; // Use actual URL
 
-        <!-- Customer Info and Checkout -->
-        <div class="customer-info-section">
-            <h3>Customer Information</h3>
-            <input class="form-input" id="customer-email" placeholder="your.email@example.com" type="email"/>
-            <input class="form-input" id="customer-phone" placeholder="+1 470 608 3818" type="tel"/>
-            <input class="form-input" id="customer-name" placeholder="First and Last Name" type="text"/>
-            <input class="form-input" id="customer-address1" placeholder="Street address, P.O. box" type="text"/>
-            <!-- Add other customer info fields here -->
-        </div>
+    const $in = document.getElementById('lf-input');
+    const $go = document.getElementById('lf-btn');
+    const $status = document.getElementById('lf-status');
+    const $results = document.getElementById('lf-results');
+    const $exact = document.getElementById('lf-exact');
+    const $alt = document.getElementById('lf-alt');
+    const $instock = document.getElementById('lf-instock');
+    const $cartCount = document.getElementById('cart-count');
+    const $coreBadgeHeader = document.getElementById('core-badge-header');
 
-        <button class="checkout-btn" id="checkout-button">Proceed to Checkout</button>
-    </div>
-</div>
-
-<script>
-    const cartItems = document.getElementById('cart-items');
-    const cartTotal = document.getElementById('cart-total');
-    const checkoutButton = document.getElementById('checkout-button');
-    const cartCount = document.getElementById('cart-count');
-
-    let cart = [];
-    let catalog = [];
+    let rows = [];
     let currentResults = [];
 
-    // Simulate loading catalog data
-    function loadCatalog() {
-        catalog = [
-            { id: 'part1', name: 'Part 1', price: 100 },
-            { id: 'part2', name: 'Part 2', price: 150 },
-            { id: 'part3', name: 'Part 3', price: 200 },
-            { id: 'part4', name: 'Part 4', price: 250 },
-        ];
-        renderResults();
+    // Load Catalog
+    async function loadCatalog(){
+      try {
+        $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading parts catalog...';
+        const res = await fetch(CSV_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const csvText = await res.text();
+        let parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true, dynamicTyping: true });
+        rows = parsed.data.map(r => {
+          const pn = (r.part_number ?? "").toString().trim();
+          return {
+            ...r,
+            __pn: pn,
+            __pn_norm: norm(pn),
+            __price_num: Number(r.price ?? NaN),
+            currency: r.currency || 'USD'
+          };
+        }).filter(x => x.__pn);
+        $status.innerHTML = rows.length ? 
+          `<i class="fas fa-check-circle"></i> Catalog loaded with ${rows.length} parts. Start searching above.` : 
+          '<i class="fas fa-exclamation-circle"></i> No parts found in catalog.';
+      } catch (e) {
+        console.error('Catalog loading error:', e);
+        $status.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Couldn't load catalog: ${e.message || e}`;
+      }
     }
 
-    // Search Logic
-    document.getElementById('lf-btn').addEventListener('click', search);
-
-    function search() {
-        const query = document.getElementById('lf-input').value.trim();
-        if (!query) return;
-        
-        // Filter catalog based on query
-        currentResults = catalog.filter(part => part.name.toLowerCase().includes(query.toLowerCase()));
-        renderResults();
+    function norm(s) {
+      return (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
     }
 
-    function renderResults() {
-        const resultsHtml = currentResults.map(part => {
-            return `<div class="result-card">
-                        <div class="card-content">
-                            <div class="part-number">${part.name}</div>
-                            <div class="part-price">$${part.price}</div>
-                            <button class="add-to-cart-btn" onclick="addToCart('${part.id}', '${part.name}', ${part.price})">Add to Cart</button>
-                        </div>
-                    </div>`;
-        }).join('');
-        document.getElementById('lf-results').innerHTML = resultsHtml;
+    function renderResults(results){
+      currentResults = results;
+      const cart = loadCart();
+      syncHeader(cart);
+      if (!results.length) {
+        $results.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><br/>No matching parts found</div>';
+        return;
+      }
+
+      $results.innerHTML = results.slice(0,100).map(r => {
+        const p = r.item;
+        const inCart = cart.find(x => x.part_number === p.__pn);
+        const qtyInCart = inCart ? inCart.quantity : 1;
+        return `
+        <div class="result-card">
+          <div class="card-content">
+            <div class="part-number">${p.__pn}</div>
+            <div class="description">${p.description || ""}</div>
+            <div class="quantity-control">
+              <button class="qty-btn" onclick="decreaseQuantity('${p.__pn}')">-</button>
+              <input type="number" value="${qtyInCart}" min="1" id="qty-${p.__pn}" />
+              <button class="qty-btn" onclick="increaseQuantity('${p.__pn}')">+</button>
+            </div>
+            <div class="action-buttons">
+              <button onclick="addToCart('${p.__pn}')">Add to Cart</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
     }
 
-    function addToCart(id, name, price) {
-        const item = { id, name, price, quantity: 1 };
-        cart.push(item);
-        updateCart();
+    function addToCart(pn) {
+      const qty = document.getElementById(`qty-${pn}`).value;
+      addOrUpdateCartItem(pn, qty);
+      renderResults(currentResults);
     }
 
-    function updateCart() {
-        const cartHtml = cart.map(item => {
-            return `<div class="cart-item">
-                        <div>${item.name}</div>
-                        <div>${item.quantity} x $${item.price}</div>
-                    </div>`;
-        }).join('');
-        cartItems.innerHTML = cartHtml;
-        cartTotal.textContent = `Total: $${cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}`;
-        cartCount.textContent = cart.length;
+    function increaseQuantity(pn) {
+      const qtyField = document.getElementById(`qty-${pn}`);
+      qtyField.value = parseInt(qtyField.value) + 1;
+      addOrUpdateCartItem(pn, qtyField.value);
     }
 
-    checkoutButton.addEventListener('click', async () => {
-        const customerEmail = document.getElementById('customer-email').value;
-        const customerName = document.getElementById('customer-name').value;
-
-        if (!customerEmail || !customerName || cart.length === 0) {
-            alert("Please fill out all fields and add items to your cart.");
-            return;
-        }
-
-        const orderData = {
-            customer: {
-                email: customerEmail,
-                name: customerName,
-                // Add more customer data as needed
-            },
-            items: cart.map(item => ({
-                part_number: item.name,
-                quantity: item.quantity,
-                price: item.price,
-            }))
-        };
-
-        try {
-            const response = await fetch('https://your-backend-url/checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            });
-            const result = await response.json();
-            if (result.success) {
-                alert("Your order has been placed!");
-            } else {
-                alert("There was an error processing your order.");
-            }
-        } catch (error) {
-            alert("An error occurred while sending the order.");
-        }
-    });
-
-    // Go to cart page (simplified for this page)
-    function goToCart() {
-        window.location.href = '#cart-section';  // Simply scroll to cart section
+    function decreaseQuantity(pn) {
+      const qtyField = document.getElementById(`qty-${pn}`);
+      qtyField.value = Math.max(1, parseInt(qtyField.value) - 1);
+      addOrUpdateCartItem(pn, qtyField.value);
     }
 
-    // Initialize catalog on page load
-    loadCatalog();
-</script>
+    function addOrUpdateCartItem(partNumber, qty) {
+      // Logic to add or update cart
+    }
 
+    function loadCart() {
+      // Logic to load cart from storage
+    }
+
+    function syncHeader(cart) {
+      // Sync header with cart count
+    }
+
+    // Run the loadCatalog on page load
+    window.onload = loadCatalog;
+
+  </script>
 </body>
 </html>
