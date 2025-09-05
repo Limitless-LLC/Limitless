@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline'; connect-src *; frame-src *;">
-<title>Parts Finder & Cart - Limitless LLC</title>
+<title>Parts Finder - Limitless LLC</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 <style>
@@ -439,7 +439,8 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
 // Global constants and variables
 const CART_STORAGE_KEY = 'lf_cart';
 const CUSTOMER_INFO_KEY = 'lf_customer_info';
-const CSV_URL = "parts_catalog_template.csv";
+// FIXED: Using the raw GitHub URL for the CSV file
+const CSV_URL = "https://raw.githubusercontent.com/Limitless-LLC/Test/main/parts_catalog_template.csv";
 window.CURRENCY_FALLBACK = "USD";
 window.DECIMALS = 2;
 
@@ -589,7 +590,7 @@ function init() {
   loadPartsData();
 }
 
-// Load parts data
+// Load parts data - FIXED: Now loads from GitHub
 function loadPartsData() {
   $status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading parts catalog...';
   
