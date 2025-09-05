@@ -125,10 +125,19 @@
     const cartCount = document.getElementById('cart-count');
 
     let cart = [];
-
-    // Load catalog data (assuming you already have this as part of your setup)
-    const catalog = []; // This should be populated with your parts data
+    let catalog = [];
     let currentResults = [];
+
+    // Simulate loading catalog data
+    function loadCatalog() {
+        catalog = [
+            { id: 'part1', name: 'Part 1', price: 100 },
+            { id: 'part2', name: 'Part 2', price: 150 },
+            { id: 'part3', name: 'Part 3', price: 200 },
+            { id: 'part4', name: 'Part 4', price: 250 },
+        ];
+        renderResults();
+    }
 
     // Search Logic
     document.getElementById('lf-btn').addEventListener('click', search);
@@ -138,7 +147,7 @@
         if (!query) return;
         
         // Filter catalog based on query
-        currentResults = catalog.filter(part => part.name.includes(query));
+        currentResults = catalog.filter(part => part.name.toLowerCase().includes(query.toLowerCase()));
         renderResults();
     }
 
@@ -147,7 +156,7 @@
             return `<div class="result-card">
                         <div class="card-content">
                             <div class="part-number">${part.name}</div>
-                            <div class="part-price">${part.price}</div>
+                            <div class="part-price">$${part.price}</div>
                             <button class="add-to-cart-btn" onclick="addToCart('${part.id}', '${part.name}', ${part.price})">Add to Cart</button>
                         </div>
                     </div>`;
@@ -216,6 +225,9 @@
     function goToCart() {
         window.location.href = '#cart-section';  // Simply scroll to cart section
     }
+
+    // Initialize catalog on page load
+    loadCatalog();
 </script>
 
 </body>
