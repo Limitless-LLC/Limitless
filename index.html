@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline'; connect-src *; frame-src *;">
 <title>Parts Finder - Limitless LLC</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
@@ -18,11 +17,6 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
 .cart-icon-header{ position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px; color:white; display:flex; align-items:center; gap:8px;}
 .cart-count{ background:#e74c3c; color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold;}
 .core-badge-header{ position:absolute; top:50px; right:20px; background:#f39c12; color:white; padding:4px 8px; border-radius:12px; font-size:12px; font-weight:600; display:none; }
-
-/* Navigation */
-.nav-back{ margin-bottom:20px;}
-.back-btn{ padding:12px 24px; background:#2c3e50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:8px; transition:.3s; text-decoration:none;}
-.back-btn:hover{ background:#1a202c; }
 
 /* Search */
 .search-section{ background:white; border-radius:16px; padding:30px; box-shadow:0 5px 20px rgba(0,0,0,.08); margin-bottom:30px;}
@@ -82,139 +76,6 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
 .empty-cart{ text-align:center; padding:40px; color:#718096; font-size:18px; }
 .empty-cart i{ font-size:48px; margin-bottom:15px; opacity:0.5; }
 
-/* Cart */
-.cart-content{ background:white; border-radius:16px; padding:25px; box-shadow:0 5px 20px rgba(0,0,0,.08);}
-.cart-items{ margin-bottom:25px; max-height:60vh; overflow-y:auto;}
-.cart-item{ border:1px solid #e2e8f0; border-radius:12px; margin-bottom:15px; overflow:hidden;}
-.cart-item-main{ display:flex; justify-content:space-between; padding:18px; align-items:center; background:#f8f9fa; cursor:pointer;}
-.cart-item-details{ flex:1;}
-.cart-item-name{ font-weight:600; margin-bottom:6px; color:#2c3e50; display:flex; align-items:center; gap:10px;}
-.cart-item-description{ color:#718096; font-size:14px; margin-bottom:8px; font-style:italic;}
-.cart-item-core-badge{ background:#f39c12; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600;}
-.cart-item-price{ color:#718096; font-size:14px; }
-.cart-item-expand{ color:#718096; font-size:14px; transition:.3s;}
-.cart-item-expand.open{ transform:rotate(180deg);}
-.cart-item-core{ padding:15px; background:#fff5f5; border-top:1px solid #fed7d7; display:none;}
-.cart-item-core-content{ display:flex; justify-content:space-between; align-items:center;}
-.cart-item-core-info{ flex:1;}
-.cart-item-core-name{ font-weight:500; margin-bottom:4px; color:#c53030;}
-.cart-item-core-desc{ color:#e53e3e; font-size:13px;}
-.cart-item-remove{ color:#e53e3e; background:none; border:none; cursor:pointer; padding:8px 16px; font-size:14px; border-radius:6px; transition:.3s;}
-.cart-item-remove:hover{ background:#fed7d7;}
-.cart-total{ font-weight:700; text-align:right; padding:20px 0; border-top:2px solid #e2e8f0; font-size:20px; color:#2c3e50;}
-
-/* Update Cart Button */
-.update-cart-btn{ padding:12px 20px; background:#2c3e50; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:500; margin-bottom:20px; display:flex; align-items:center; gap:8px; transition:.3s;}
-.update-cart-btn:hover{ background:#1a202c; }
-
-/* Customer Info + Checkout */
-.customer-info-section{ background:#f8f9fa; border-radius:12px; padding:20px; margin-bottom:20px;}
-.customer-info-title{ font-size:20px; color:#2c3e50; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;}
-.customer-form{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:15px;}
-.form-group{ margin-bottom:15px;}
-.form-label{ display:block; margin-bottom:6px; font-weight:500; color:#4a5568;}
-.form-input,.form-textarea,.form-select{ width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; transition:border-color .3s;}
-.form-textarea{ min-height:80px; resize:vertical;}
-.form-required::after{ content:"*"; color:#e53e3e; margin-left:4px;}
-.form-error{ color:#e53e3e; font-size:14px; margin-top:5px; display:none;}
-.invalid{ border-color:#e53e3e !important; box-shadow:0 0 0 3px rgba(229,62,62,.15) !important; }
-
-/* Checkout */
-.checkout-section{ background:#f8f9fa; border-radius:12px; padding:20px; margin-top:20px;}
-.checkout-title{ font-size:20px; color:#2c3e50; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;}
-.checkout-instructions{ margin-bottom:15px; color:#4a5568; line-height:1.5;}
-.payment-method{ margin-bottom:15px;}
-.payment-label{ display:block; margin-bottom:6px; font-weight:500; color:#4a5568;}
-.payment-select{ width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; margin-bottom:8px;}
-.payment-note{ color:#718096; font-size:14px; font-style:italic;}
-.shipping-note{ margin-bottom:15px; padding:12px; background:#ebf8ff; border-radius:8px; color:#2b6cb0; border-left:4px solid #4299e1;}
-.compliance-notes{ margin-bottom:20px;}
-.compliance-note{ color:#718096; font-size:14px; margin-bottom:8px; padding-left:15px; position:relative;}
-.compliance-note:before{ content:"•"; position:absolute; left:0;}
-.checkout-btn{ padding:15px 30px; background:linear-gradient(120deg,#2980b9 0%,#3498db 100%); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600; font-size:16px; width:100%; transition:.3s; display:flex; align-items:center; justify-content:center; gap:10px;}
-.checkout-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(52,152,219,.4);}
-.checkout-helper{ margin-top:10px; text-align:center; color:#718096; font-size:14px;}
-
-/* Error message */
-.error-message{ background:#fed7d7; color:#c53030; padding:12px; border-radius:8px; margin-bottom:15px; display:none;}
-.success-message{ background:#c6f6d5; color:#2f855a; padding:12px; border-radius:8px; margin-bottom:15px; display:none;}
-
-/* Custom popup */
-.custom-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    display: none;
-}
-.popup-content {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-.popup-title {
-    font-size: 20px;
-    color: #2c3e50;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e2e8f0;
-}
-.popup-message {
-    margin-bottom: 20px;
-    line-height: 1.5;
-}
-.popup-close-btn {
-    padding: 10px 20px;
-    background: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    display: block;
-    margin-left: auto;
-}
-
-/* Loading overlay */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    display: none;
-}
-.loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-/* View management */
-.view-section {
-    display: none;
-}
-.view-section.active {
-    display: block;
-}
-
 /* Responsive */
 @media (max-width:768px){
   .header h1{ font-size:2.2rem;}
@@ -227,19 +88,20 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
   .cart-item-main{ flex-direction:column; align-items:flex-start; gap:10px;}
   .cart-icon-header{ position:relative; top:0; right:0; margin-top:15px; justify-content:center;}
   .core-badge-header{ position:relative; top:0; right:0; margin:5px auto; width:fit-content;}
-  .customer-form{ grid-template-columns:1fr;}
 }
 
+/* Animations */
 @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-@keyframes spin{ 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.loading{ display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite;}
+@keyframes spin{ to{ transform:rotate(360deg);} }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
     <h1><i class="fas fa-search"></i> Part Finder</h1>
-    <p id="header-description">Search our extensive inventory of diesel engine parts</p>
-    <div class="cart-icon-header" id="cart-button">
+    <p>Search our extensive inventory of diesel engine parts</p>
+    <div class="cart-icon-header" onclick="goCartPage()">
       <i class="fas fa-shopping-cart"></i>
       <div class="cart-count" id="cart-count">0</div>
     </div>
@@ -248,803 +110,437 @@ body{background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);color:#2d3748;li
     </div>
   </div>
 
-  <!-- Search View -->
-  <div id="search-view" class="view-section active">
-    <div class="search-section">
-      <div class="search-box">
-        <input class="search-input" id="lf-input" placeholder="Enter part number, description, or keyword..."/>
-        <button class="search-btn" id="lf-btn"><i class="fas fa-search"></i> Search</button>
-      </div>
-
-      <div class="filters">
-        <div class="filter-item"><input id="lf-exact" type="checkbox"/><label for="lf-exact">Exact Match</label></div>
-        <div class="filter-item"><input id="lf-alt" type="checkbox" checked/><label for="lf-alt">Include Alternate Parts</label></div>
-        <div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
-      </div>
-
-      <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
+  <div class="search-section">
+    <div class="search-box">
+      <input class="search-input" id="lf-input" placeholder="Enter part number, description, or keyword..."/>
+      <button class="search-btn" id="lf-btn"><i class="fas fa-search"></i> Search</button>
     </div>
 
-    <div class="results-grid" id="lf-results"></div>
-  </div>
-
-  <!-- Cart View -->
-  <div id="cart-view" class="view-section">
-    <div class="nav-back">
-      <a class="back-btn" id="back-to-search"><i class="fas fa-arrow-left"></i> Back to Search</a>
+    <div class="filters">
+      <div class="filter-item"><input id="lf-exact" type="checkbox"/><label for="lf-exact">Exact Match</label></div>
+      <div class="filter-item"><input id="lf-alt" type="checkbox" checked/><label for="lf-alt">Include Alternate Parts</label></div>
+      <div class="filter-item"><input id="lf-instock" type="checkbox"/><label for="lf-instock">In Stock Only</label></div>
     </div>
 
-    <div class="cart-content">
-      <div class="error-message" id="error-message"></div>
-      <div class="success-message" id="success-message"></div>
-      <button class="update-cart-btn" id="update-cart-button"><i class="fas fa-sync-alt"></i> Update Cart Quantities</button>
-      <div class="cart-items" id="cart-items">
-        <div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>
-      </div>
-      <div class="cart-total" id="cart-total">Total: $0.00</div>
-
-      <!-- Customer Information -->
-      <div class="customer-info-section">
-        <div class="customer-info-title">Customer Information</div>
-        <div class="customer-form">
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-email">Email Address</label>
-            <input class="form-input" id="customer-email" placeholder="your.email@example.com" type="email"/>
-            <div class="form-error" id="email-error">Please enter a valid email address</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-phone">Phone Number</label>
-            <input class="form-input" id="customer-phone" placeholder="+1 470 608 3818" type="tel"/>
-            <div class="form-error" id="phone-error">Please enter a valid phone number</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="customer-company">Company Name</label>
-            <input class="form-input" id="customer-company" placeholder="Your Company Name" type="text"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-name">Full Name</label>
-            <input class="form-input" id="customer-name" placeholder="First and Last Name" type="text"/>
-            <div class="form-error" id="name-error">Please enter your name</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-address1">Address Line 1</label>
-            <input class="form-input" id="customer-address1" placeholder="Street address, P.O. box" type="text"/>
-            <div class="form-error" id="address1-error">Please enter your address</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="customer-address2">Address Line 2</label>
-            <input class="form-input" id="customer-address2" placeholder="Apartment, suite, unit, building, floor, etc." type="text"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-city">City</label>
-            <input class="form-input" id="customer-city" placeholder="City" type="text"/>
-            <div class="form-error" id="city-error">Please enter your city</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-state">State/Province/Region</label>
-            <input class="form-input" id="customer-state" placeholder="State / Province / Region" type="text"/>
-            <div class="form-error" id="state-error">Please enter your state/province</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-zip">ZIP/Postal Code</label>
-            <input class="form-input" id="customer-zip" placeholder="ZIP / Postal code" type="text"/>
-            <div class="form-error" id="zip-error">Please enter your ZIP/postal code</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label form-required" for="customer-country">Country</label>
-            <select class="form-select" id="customer-country">
-              <option value="">Select Country</option>
-              <option selected value="US">United States</option>
-              <option value="CA">Canada</option>
-              <option value="MX">Mexico</option>
-              <option value="AR">Argentina</option>
-              <option value="BR">Brazil</option>
-              <option value="CL">Chile</option>
-              <option value="CO">Colombia</option>
-              <option value="CR">Costa Rica</option>
-              <option value="DO">Dominican Republic</option>
-              <option value="EC">Ecuador</option>
-              <option value="SV">El Salvador</option>
-              <option value="GT">Guatemala</option>
-              <option value="HN">Honduras</option>
-              <option value="NI">Nicaragua</option>
-              <option value="PA">Panama</option>
-              <option value="PE">Peru</option>
-              <option value="PR">Puerto Rico</option>
-              <option value="UY">Uruguay</option>
-              <option value="VE">Venezuela</option>
-              <option value="AE">United Arab Emirates</option>
-              <option value="BH">Bahrain</option>
-              <option value="EG">Egypt</option>
-              <option value="IR">Iran</option>
-              <option value="IQ">Iraq</option>
-              <option value="IL">Israel</option>
-              <option value="JO">Jordan</option>
-              <option value="KW">Kuwait</option>
-              <option value="LB">Lebanon</option>
-              <option value="OM">Oman</option>
-              <option value="QA">Qatar</option>
-              <option value="SA">Saudi Arabia</option>
-              <option value="TR">Turkey</option>
-              <option value="AU">Australia</option>
-              <option value="GB">United Kingdom</option>
-              <option value="DE">Germany</option>
-              <option value="FR">France</option>
-              <option value="OTHER">Other</option>
-            </select>
-            <div class="form-error" id="country-error">Please select your country</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="engine-model">Engine Model (Optional)</label>
-            <input class="form-input" id="engine-model" placeholder="Engine Model" type="text"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="engine-serial">Engine Serial Number (Optional)</label>
-            <input class="form-input" id="engine-serial" placeholder="Engine Serial Number" type="text"/>
-          </div>
-          <div class="form-group" style="grid-column:1 / -1;">
-            <label class="form-label" for="customer-instructions">Special Instructions</label>
-            <textarea class="form-textarea" id="customer-instructions" placeholder="Any special shipping instructions or notes about your order"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="checkout-section">
-        <div class="checkout-title">How Checkout Works</div>
-        <div class="checkout-instructions">
-          The Proceed to Checkout button does not process payment—it sends your order details to Limitless Contracting so we can confirm availability, shipping, and send you a secure payment link.
-        </div>
-        <div class="payment-method">
-          <label class="payment-label" for="payment-method">Choose your preferred payment method:</label>
-          <select class="payment-select" id="payment-method">
-            <option value="">Select a payment method</option>
-            <option value="credit_card">Credit Card (Visa/Mastercard/AmEx)</option>
-            <option value="paypal">PayPal</option>
-            <option value="bank_wire">Bank Wire</option>
-            <option value="zelle">Zelle</option>
-            <option value="ach">ACH (U.S. only)</option>
-          </select>
-          <div class="payment-note" id="payment-note"></div>
-        </div>
-        <div class="shipping-note">
-          <strong>Shipping &amp; Handling:</strong> Calculated after we confirm weight, dimensions, and destination. You'll see the final S&amp;H on our reply email with your payment link.
-        </div>
-        <div class="compliance-notes">
-          <div class="compliance-note">• Stock &amp; Lead Time: Availability and lead times are confirmed by email before payment.</div>
-          <div class="compliance-note">• Tax: Sales tax, if applicable, is shown on your final invoice (or buyer may owe use tax).</div>
-          <div class="compliance-note">• International: Duties and import charges are paid by the consignee unless otherwise agreed.</div>
-        </div>
-        <button class="checkout-btn" id="checkout-button"><i class="fas fa-paper-plane"></i> Proceed to Checkout</button>
-        <div class="checkout-helper">This will email your order details to Limitless; you'll get a confirmation and payment link.</div>
-      </div>
-    </div>
+    <div class="status" id="lf-status"><i class="fas fa-info-circle"></i> Loading parts catalog...</div>
   </div>
-</div>
 
-<div class="loading-overlay" id="loading-overlay">
-  <div class="loading-spinner"></div>
-</div>
-
-<div class="custom-popup" id="validation-popup">
-  <div class="popup-content">
-    <div class="popup-title">Missing Information</div>
-    <div class="popup-message" id="validation-message"></div>
-    <button class="popup-close-btn" id="popup-close-btn">OK</button>
-  </div>
+  <div class="results-grid" id="lf-results"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 <script>
-// Global constants and variables
-const CART_STORAGE_KEY = 'lf_cart';
-const CUSTOMER_INFO_KEY = 'lf_customer_info';
-// FIXED: Using the raw GitHub URL for the CSV file
-const CSV_URL = "https://raw.github.com/Limitless-LLC/Test/main/parts_catalog_template.csv";
-window.CURRENCY_FALLBACK = "USD";
-window.DECIMALS = 2;
+(() => {
+  const CSV_URL = "parts_catalog_template.csv";
+  const CURRENCY_FALLBACK = "USD";
+  const DECIMALS = 2;
+  const CART_STORAGE_KEY = 'lf_cart';
 
-// DOM elements
-const $searchView = document.getElementById('search-view');
-const $cartView = document.getElementById('cart-view');
-const $headerDescription = document.getElementById('header-description');
-const $cartButton = document.getElementById('cart-button');
-const $backToSearch = document.getElementById('back-to-search');
-const $cartCount = document.getElementById('cart-count');
-const $coreBadgeHeader = document.getElementById('core-badge-header');
+  const $in = document.getElementById('lf-input');
+  const $go = document.getElementById('lf-btn');
+  const $status = document.getElementById('lf-status');
+  const $results = document.getElementById('lf-results');
+  const $exact = document.getElementById('lf-exact');
+  const $alt = document.getElementById('lf-alt');
+  const $instock = document.getElementById('lf-instock');
 
-// Search view elements
-const $in = document.getElementById('lf-input');
-const $go = document.getElementById('lf-btn');
-const $status = document.getElementById('lf-status');
-const $results = document.getElementById('lf-results');
-const $exact = document.getElementById('lf-exact');
-const $alt = document.getElementById('lf-alt');
-const $instock = document.getElementById('lf-instock');
+  const $cartCount = document.getElementById('cart-count');
+  const $coreBadgeHeader = document.getElementById('core-badge-header');
 
-// Cart view elements
-const $cartItems = document.getElementById('cart-items');
-const $cartTotal = document.getElementById('cart-total');
-const $errorMessage = document.getElementById('error-message');
-const $successMessage = document.getElementById('success-message');
-const $loadingOverlay = document.getElementById('loading-overlay');
-const $validationPopup = document.getElementById('validation-popup');
-const $validationMessage = document.getElementById('validation-message');
-const $paymentMethod = document.getElementById('payment-method');
-const $paymentNote = document.getElementById('payment-note');
-const $customerEmail = document.getElementById('customer-email');
-const $customerPhone = document.getElementById('customer-phone');
-const $customerCompany = document.getElementById('customer-company');
-const $customerName = document.getElementById('customer-name');
-const $customerAddress1 = document.getElementById('customer-address1');
-const $customerAddress2 = document.getElementById('customer-address2');
-const $customerCity = document.getElementById('customer-city');
-const $customerState = document.getElementById('customer-state');
-const $customerZip = document.getElementById('customer-zip');
-const $customerCountry = document.getElementById('customer-country');
-const $customerInstructions = document.getElementById('customer-instructions');
-const $engineModel = document.getElementById('engine-model');
-const $engineSerial = document.getElementById('engine-serial');
-
-// Utility functions
-const idSafe = v => (v || "").toString().replace(/[^a-zA-Z0-9_-]/g, "_");
-const norm = s => (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
-window.fmtMoney = (num, cur) => { 
-  const n = Number(num); 
-  if (!isFinite(n)) return String(num || ""); 
-  return `${cur || window.CURRENCY_FALLBACK} ${n.toFixed(window.DECIMALS)}`; 
-};
-window.esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
-  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
-));
-
-// View management
-function showView(viewName) {
-  if (viewName === 'search') {
-    $searchView.classList.add('active');
-    $cartView.classList.remove('active');
-    $headerDescription.textContent = 'Search our extensive inventory of diesel engine parts';
-    document.title = 'Parts Finder - Limitless LLC';
-  } else if (viewName === 'cart') {
-    $searchView.classList.remove('active');
-    $cartView.classList.add('active');
-    $headerDescription.textContent = 'Review your items and proceed to checkout';
-    document.title = 'Cart - Part Finder';
-    window.renderCart();
-  }
-}
-
-// Cart management
-window.loadCart = function() { 
-  try { 
-    return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]'); 
-  } catch(_) { 
-    return []; 
-  } 
-};
-
-window.saveCart = function(cart) { 
-  try { 
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); 
-    // Trigger storage event for other tabs
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: CART_STORAGE_KEY,
-      newValue: JSON.stringify(cart)
-    }));
-  } catch(_){
-    console.warn('Failed to save cart to localStorage');
-  }
-};
-
-function syncHeader() {
-  const cart = window.loadCart();
-  const totalItems = cart.reduce((s,i)=>s+(Math.max(1, parseInt(i.quantity||1))),0);
-  const hasCore = cart.some(i => i.corePartNumber);
-  
-  $cartCount.textContent = totalItems;
-  $coreBadgeHeader.style.display = hasCore ? 'flex' : 'none';
-}
-
-// Event listeners
-$cartButton.addEventListener('click', () => showView('cart'));
-$backToSearch.addEventListener('click', () => showView('search'));
-
-// Payment method notes
-$paymentMethod.addEventListener('change', function() {
-  const notes = {
-    'credit_card': 'We will send you a secure payment link for credit card processing.',
-    'paypal': 'We will send you a PayPal invoice for payment.',
-    'bank_wire': 'We will provide bank wire instructions for payment.',
-    'zelle': 'We will provide Zelle payment details (US only).',
-    'ach': 'We will provide ACH payment details (US only).'
+  const idSafe = v => (v || "").toString().replace(/[^a-zA-Z0-9_-]/g, "_");
+  const norm = s => (s || "").toString().toUpperCase().replace(/[\s\-_.]/g, "");
+  const fmtMoney = (num, cur) => {
+    const n = Number(num);
+    if (!isFinite(n)) return String(num || "");
+    return `${cur || CURRENCY_FALLBACK} ${n.toFixed(DECIMALS)}`;
   };
-  $paymentNote.textContent = notes[this.value] || '';
-});
+  const esc = s => (s ?? '').toString().replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
 
-// Initialize
-function init() {
-  // Load customer info if available
-  try {
-    const customerInfo = JSON.parse(localStorage.getItem(CUSTOMER_INFO_KEY) || '{}');
-    $customerEmail.value = customerInfo.email || '';
-    $customerPhone.value = customerInfo.phone || '';
-    $customerCompany.value = customerInfo.company || '';
-    $customerName.value = customerInfo.name || '';
-    $customerAddress1.value = customerInfo.address1 || '';
-    $customerAddress2.value = customerInfo.address2 || '';
-    $customerCity.value = customerInfo.city || '';
-    $customerState.value = customerInfo.state || '';
-    $customerZip.value = customerInfo.zip || '';
-    $customerCountry.value = customerInfo.country || '';
-    $customerInstructions.value = customerInfo.instructions || '';
-    $engineModel.value = customerInfo.engineModel || '';
-    $engineSerial.value = customerInfo.engineSerial || '';
-  } catch (e) {
-    console.warn('Failed to load customer info', e);
+  // ---- Cart helpers with consistent storage ----
+  const loadCart = () => { 
+    try { 
+      return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]'); 
+    } catch(_) { 
+      return []; 
+    } 
+  };
+  
+  const saveCart = (cart) => { 
+    try { 
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); 
+      // Trigger storage event for other tabs
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: CART_STORAGE_KEY,
+        newValue: JSON.stringify(cart)
+      }));
+    } catch(_){
+      console.warn('Failed to save cart to localStorage');
+    }
+  };
+  
+  const syncHeader = (cart) => {
+    const totalItems = cart.reduce((s,i)=>s+(Math.max(1, parseInt(i.quantity||1))),0);
+    const hasCore = cart.some(i => (Number(i.core_charge)||0) > 0);
+    $cartCount.textContent = totalItems;
+    $coreBadgeHeader.style.display = hasCore ? 'flex' : 'none';
+  };
+
+  function addOrUpdateCartItem(partNumber, qty, price, currency, coreCharge, description, brand, uom){
+    const cart = loadCart();
+    const idx = cart.findIndex(x => x.part_number === partNumber);
+    const item = {
+      part_number: partNumber,
+      name: partNumber, // Keep for compatibility
+      description: description || "",
+      brand: brand || "",
+      uom: uom || "",
+      quantity: Math.max(1, parseInt(qty||1)),
+      price: Number(price) || 0,
+      currency: currency || CURRENCY_FALLBACK,
+      core_charge: Number(coreCharge) || 0,
+      corePart: (Number(coreCharge) || 0) > 0
+    };
+    
+    if (idx >= 0) {
+      cart[idx] = item;
+    } else {
+      cart.push(item);
+    }
+    
+    saveCart(cart);
+    syncHeader(cart);
+    return cart;
   }
 
-  // Initialize cart
-  syncHeader();
-  
-  // Load parts data
-  loadPartsData();
-}
+  function removeFromCart(partNumber){
+    const cart = loadCart().filter(i => i.part_number !== partNumber);
+    saveCart(cart);
+    syncHeader(cart);
+    return cart;
+  }
 
-// Load parts data - FIXED: Now loads from GitHub
-function loadPartsData() {
-  $status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading parts catalog...';
-  
-  Papa.parse(CSV_URL, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      if (results.data && results.data.length > 0) {
-        window.partsData = results.data;
-        $status.innerHTML = '<i class="fas fa-check-circle"></i> Ready to search. Enter a part number or description above.';
-      } else {
-        $status.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No parts data found. Please check the data source.';
+  function isInCart(partNumber) {
+    const cart = loadCart();
+    return cart.find(item => item.part_number === partNumber);
+  }
+
+  // Expose global functions
+  window.goCartPage = () => { 
+    window.location.href = 'cart.html'; 
+  };
+
+  // UI helpers for a single card
+  function setButtonState(pn, state, inCart = null){
+    const btn = document.getElementById(`btn-${idSafe(pn)}`);
+    if (!btn) return;
+    
+    // Get current cart state if not provided
+    if (inCart === null) {
+      inCart = isInCart(pn);
+    }
+    
+    btn.classList.remove('update', 'in-cart');
+    
+    if (state === 'go') {
+      btn.classList.add('in-cart');
+      btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Go to Cart`;
+      btn.dataset.state = 'go';
+      btn.dataset.added = 'true';
+    } else if (state === 'update') {
+      btn.classList.add('update');
+      btn.innerHTML = `<i class="fas fa-save"></i> Update Cart`;
+      btn.dataset.state = 'update';
+    } else if (inCart) {
+      btn.classList.add('in-cart');
+      btn.innerHTML = `<i class="fas fa-shopping-cart"></i> Go to Cart`;
+      btn.dataset.state = 'go';
+      btn.dataset.added = 'true';
+    } else {
+      btn.innerHTML = `<i class="fas fa-cart-plus"></i> Add to Cart`;
+      btn.dataset.state = 'add';
+      btn.dataset.added = 'false';
+    }
+  }
+
+  function attachQtyHandlers(pn){
+    const sid = idSafe(pn);
+    const qtyInput = document.getElementById(`qty-${sid}`);
+    const minus = document.getElementById(`minus-${sid}`);
+    const plus = document.getElementById(`plus-${sid}`);
+    if (!qtyInput) return;
+
+    const markDirty = () => {
+      const inCart = isInCart(pn);
+      if (inCart && parseInt(qtyInput.value) !== parseInt(inCart.quantity)) {
+        setButtonState(pn, 'update', inCart);
       }
-    },
-    error: function(err) {
-      console.error('Error loading CSV:', err);
-      $status.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error loading parts catalog. Please try again later.';
+    };
+    
+    qtyInput.addEventListener('input', markDirty);
+    qtyInput.addEventListener('change', markDirty);
+    
+    if (minus) {
+      minus.addEventListener('click', () => {
+        const currentVal = parseInt(qtyInput.value || 1);
+        const newVal = Math.max(1, currentVal - 1);
+        qtyInput.value = newVal;
+        markDirty();
+      });
+    }
+    
+    if (plus) {
+      plus.addEventListener('click', () => {
+        const currentVal = parseInt(qtyInput.value || 1);
+        const newVal = currentVal + 1;
+        qtyInput.value = newVal;
+        markDirty();
+      });
+    }
+  }
+
+  window.handleCartButton = (pn, price, curr, core, desc, brand, uom) => {
+    const sid = idSafe(pn);
+    const qtyEl = document.getElementById(`qty-${sid}`);
+    const qty = Math.max(1, parseInt(qtyEl?.value || 1));
+    const btn = document.getElementById(`btn-${sid}`);
+    const state = btn?.dataset.state || 'add';
+
+    if (state === 'go') {
+      window.goCartPage();
+      return;
+    }
+    
+    if (state === 'update') {
+      addOrUpdateCartItem(pn, qty, price, curr, core, desc, brand, uom);
+      toastOnCard(sid, 'Updated in cart');
+      setButtonState(pn, 'go');
+      toggleRemoveLink(pn, true);
+      return;
+    }
+    
+    // state === 'add'
+    addOrUpdateCartItem(pn, qty, price, curr, core, desc, brand, uom);
+    toastOnCard(sid, 'Added to cart');
+    setButtonState(pn, 'go');
+    toggleRemoveLink(pn, true);
+  };
+
+  window.handleRemoveFromCard = (pn) => {
+    removeFromCart(pn);
+    setButtonState(pn, 'add');
+    const sid = idSafe(pn);
+    const qtyEl = document.getElementById(`qty-${sid}`);
+    if (qtyEl) qtyEl.value = 1;
+    toggleRemoveLink(pn, false);
+    toastOnCard(sid, 'Removed from cart');
+  };
+
+  function toggleRemoveLink(pn, show){
+    const link = document.getElementById(`remove-${idSafe(pn)}`);
+    if (link) link.style.display = show ? 'inline' : 'none';
+  }
+
+  function toastOnCard(sid, text){
+    const card = document.querySelector(`[data-part-id="${sid}"]`) || 
+                 document.getElementById(`qty-${sid}`)?.closest('.result-card');
+    if (!card) return;
+    
+    // Remove existing toasts
+    const existingToasts = card.querySelectorAll('.inline-toast');
+    existingToasts.forEach(t => t.remove());
+    
+    const t = document.createElement('div');
+    t.className = 'inline-toast';
+    t.innerHTML = `<i class="fas fa-check-circle"></i> ${text}`;
+    card.appendChild(t);
+    setTimeout(()=>t.remove(),2000);
+  }
+
+  // Listen for cart changes from other tabs
+  window.addEventListener('storage', (e) => {
+    if (e.key === CART_STORAGE_KEY) {
+      const cart = loadCart();
+      syncHeader(cart);
+      // Re-render current results to update button states
+      if (currentResults.length > 0) {
+        renderResults(currentResults);
+      }
     }
   });
-}
 
-// Search functionality
-$go.addEventListener('click', performSearch);
-$in.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') performSearch();
-});
+  // --------- Catalog + search ----------
+  let rows = [];
+  let currentResults = [];
+  
+  (async function loadCatalog(){
+    try {
+      $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading parts catalog...';
+      const res = await fetch(CSV_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const csvText = await res.text();
+      let parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true, dynamicTyping: true });
+      if (parsed.data.length && Object.keys(parsed.data[0]).length <= 1) {
+        parsed = Papa.parse(csvText, { header: true, delimiter: "\t", skipEmptyLines: true, dynamicTyping: true });
+      }
+      rows = parsed.data.map(r => {
+        const pn = (r.part_number ?? "").toString().trim();
+        const alt = (r.alt_pns ?? "").toString().split(/[;,]/).map(s => s.trim()).filter(Boolean);
+        return {
+          ...r,
+          __pn: pn,
+          __pn_norm: norm(pn),
+          __alts: alt,
+          __alts_norm: alt.map(norm),
+          __stock_num: Number(r.stock_qty ?? 0),
+          __lead_num: Number(r.lead_days ?? 0),
+          __price_num: Number(r.price ?? NaN),
+          __core_num: Number(r.core_charge ?? 0),
+          currency: r.currency || CURRENCY_FALLBACK
+        };
+      }).filter(x => x.__pn);
+      $status.innerHTML = rows.length ? 
+        `<i class="fas fa-check-circle"></i> Catalog loaded with ${rows.length} parts. Start searching above.` : 
+        '<i class="fas fa-exclamation-circle"></i> No parts found in catalog.';
+    } catch (e) {
+      console.error('Catalog loading error:', e);
+      $status.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Couldn't load catalog: ${e.message || e}`;
+    }
+  })();
 
-function performSearch() {
-  const query = $in.value.trim();
-  if (!query) return;
-  
-  $status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
-  
-  // Use Fuse.js for fuzzy search
-  const options = {
-    keys: [
-      { name: 'PartNumber', weight: 0.5 },
-      { name: 'AlternatePartNumbers', weight: 0.3 },
-      { name: 'Description', weight: 0.2 }
-    ],
-    threshold: $exact.checked ? 0.1 : 0.4,
-    includeScore: true
-  };
-  
-  const fuse = new Fuse(window.partsData || [], options);
-  let results = fuse.search(query);
-  
-  // Filter by stock if needed
-  if ($instock.checked) {
-    results = results.filter(r => {
-      const stock = parseInt(r.item.StockQuantity || 0);
-      return stock > 0;
+  function fuseFor(list){
+    return new Fuse(list, {
+      includeScore:true,
+      threshold:0.3,
+      keys:[ 
+        {name:"__pn",weight:0.7}, 
+        {name:"alt_pns",weight:0.3}, 
+        {name:"description",weight:0.2} 
+      ]
     });
   }
-  
-  // Sort by relevance
-  results.sort((a, b) => a.score - b.score);
-  
-  // Display results
-  displayResults(results.map(r => r.item));
-}
 
-function displayResults(results) {
-  $results.innerHTML = '';
-  
-  if (results.length === 0) {
-    $status.innerHTML = '<i class="fas fa-search"></i> No parts found. Try a different search term.';
-    return;
-  }
-  
-  $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${results.length} matching parts`;
-  
-  results.forEach(part => {
-    const cart = window.loadCart();
-    const inCart = cart.find(item => item.partNumber === part.PartNumber);
-    const quantity = inCart ? inCart.quantity : 1;
-    
-    const resultCard = document.createElement('div');
-    resultCard.className = 'result-card';
-    resultCard.innerHTML = `
-      ${part.CorePartNumber ? `<div class="core-badge"><i class="fas fa-exclamation-circle"></i> Core Item</div>` : ''}
-      <div class="card-image">
-        <img src="${part.ImageURL || 'https://github.com/Limitless-LLC/Test/blob/main/'}" alt="${esc(part.Description)}" onerror="this.src='https://github.com/Limitless-LLC/Test/blob/main/'">
-      </div>
-      <div class="card-content">
-        <div class="part-number">${esc(part.PartNumber)}</div>
-        <div class="brand-uom">${esc(part.Brand || 'Unknown Brand')} | ${esc(part.UnitOfMeasure || 'EA')}</div>
-        <div class="description">${esc(part.Description)}</div>
-        
-        <div class="chips">
-          <span class="chip price">${fmtMoney(part.Price, part.Currency)}</span>
-          <span class="chip stock">${parseInt(part.StockQuantity || 0) > 0 ? 'In Stock' : 'Out of Stock'}</span>
-          ${part.CorePartNumber ? `<span class="chip core">Core: ${esc(part.CorePrice || '0')}</span>` : ''}
+  function renderResults(results){
+    currentResults = results;
+    const cart = loadCart();
+    syncHeader(cart);
+
+    if (!results.length) {
+      $results.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><br/>No matching parts found</div>';
+      return;
+    }
+
+    $results.innerHTML = results.slice(0,100).map(r=>{
+      const p = r.item;
+      const inCart = cart.find(x => x.part_number === p.__pn);
+      const qtyInCart = inCart ? inCart.quantity : 1;
+      const isCore = (p.__core_num||0) > 0;
+      const sid = idSafe(p.__pn);
+
+      return `
+      <div class="result-card" data-part-id="${sid}">
+        ${isCore ? `<div class="core-badge" title="Core charge applies"><i class="fas fa-exclamation-circle"></i> Core</div>` : ''}
+        <div class="card-image">
+          <img src="${p.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${esc(p.__pn)}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'"/>
         </div>
-        
-        ${part.AlternatePartNumbers ? `<div class="alt-pns">Alternates: ${esc(part.AlternatePartNumbers)}</div>` : ''}
-        
-        <div class="quantity-control">
-          <span class="quantity-label">Qty:</span>
-          <button class="qty-btn" onclick="updateQuantity('${idSafe(part.PartNumber)}', -1)">-</button>
-          <input type="number" class="quantity-input" id="qty-${idSafe(part.PartNumber)}" value="${quantity}" min="1" onchange="updateQuantityInput('${idSafe(part.PartNumber)}')">
-          <button class="qty-btn" onclick="updateQuantity('${idSafe(part.PartNumber)}', 1)">+</button>
-        </div>
-        
-        <div class="action-buttons">
-          <button class="action-btn cart-btn ${inCart ? 'in-cart' : ''}" onclick="addToCart('${idSafe(part.PartNumber)}')">
-            <i class="fas ${inCart ? 'fa-check' : 'fa-cart-plus'}"></i> ${inCart ? 'In Cart' : 'Add to Cart'}
-          </button>
-          <button class="action-btn whatsapp-btn" onclick="shareViaWhatsApp('${idSafe(part.PartNumber)}')">
-            <i class="fab fa-whatsapp"></i> Share
-          </button>
-        </div>
-        
-        ${inCart ? `
-          <div class="inline-action">
-            <button class="remove-link" onclick="removeFromCart('${idSafe(part.PartNumber)}')">
-              <i class="fas fa-trash"></i> Remove from cart
+        <div class="card-content">
+          <div class="part-number">${esc(p.__pn)}</div>
+          <div class="brand-uom">${esc(p.brand || '')} | ${esc(p.uom || '')}</div>
+          <div class="description">${esc(p.description || '')}</div>
+          <div class="chips">
+            <span class="chip price"><i class="fas fa-tag"></i> ${fmtMoney(p.__price_num, p.currency)}</span>
+            <span class="chip stock"><i class="fas fa-clock"></i> Lead Time: 2–8 Days</span>
+            ${isCore ? `<span class="chip core"><i class="fas fa-exclamation-circle"></i> Core: ${fmtMoney(p.__core_num, p.currency)}</span>` : ''}
+          </div>
+          ${p.__alts.length ? `<div class="alt-pns"><strong>Alternates:</strong> ${esc(p.__alts.join(', '))}</div>` : ''}
+          <div class="quantity-control">
+            <span class="quantity-label">Quantity:</span>
+            <button class="qty-btn" id="minus-${sid}" type="button">−</button>
+            <input type="number" class="quantity-input" id="qty-${sid}" value="${qtyInCart}" min="1" max="9999"/>
+            <button class="qty-btn" id="plus-${sid}" type="button">+</button>
+          </div>
+          <div class="action-buttons">
+            <button 
+              class="action-btn cart-btn ${inCart ? 'in-cart' : ''}" 
+              id="btn-${sid}"
+              data-added="${inCart ? 'true':'false'}"
+              data-state="${inCart ? 'go':'add'}"
+              onclick="handleCartButton('${esc(p.__pn)}', ${p.__price_num||0}, '${esc(p.currency||CURRENCY_FALLBACK)}', ${p.__core_num||0}, '${esc(p.description||'')}', '${esc(p.brand||'')}', '${esc(p.uom||'')}')">
+              <i class="fas ${inCart ? 'fa-shopping-cart':'fa-cart-plus'}"></i> ${inCart ? 'Go to Cart':'Add to Cart'}
             </button>
+            <a class="action-btn whatsapp-btn" href="https://wa.me/?text=${encodeURIComponent('I need information about part ' + p.__pn)}" target="_blank">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
           </div>
-        ` : ''}
-      </div>
-    `;
-    
-    $results.appendChild(resultCard);
-  });
-}
+          <div class="inline-action">
+            <button id="remove-${sid}" class="remove-link" style="display:${inCart?'inline':'none'}" onclick="handleRemoveFromCard('${esc(p.__pn)}')">Remove from Cart</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
 
-// Cart functions
-window.addToCart = function(partId) {
-  const part = window.partsData.find(p => idSafe(p.PartNumber) === partId);
-  if (!part) return;
-  
-  const cart = window.loadCart();
-  const existingItem = cart.find(item => item.partNumber === part.PartNumber);
-  
-  if (existingItem) {
-    existingItem.quantity = parseInt(document.getElementById(`qty-${partId}`).value) || 1;
-  } else {
-    cart.push({
-      partNumber: part.PartNumber,
-      description: part.Description,
-      price: part.Price,
-      currency: part.Currency,
-      quantity: parseInt(document.getElementById(`qty-${partId}`).value) || 1,
-      corePartNumber: part.CorePartNumber,
-      corePrice: part.CorePrice,
-      image: part.ImageURL
+    // Attach quantity handlers after rendering
+    results.slice(0,100).forEach(r => {
+      attachQtyHandlers(r.item.__pn);
     });
   }
-  
-  window.saveCart(cart);
-  syncHeader();
-  
-  // Show success message
-  const toast = document.createElement('div');
-  toast.className = 'inline-toast';
-  toast.innerHTML = `<i class="fas fa-check-circle"></i> Added to cart`;
-  document.getElementById(`qty-${partId}`).closest('.result-card').appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 2000);
-  
-  // Update the UI
-  displayResults(window.partsData.filter(p => 
-    window.partsData.map(part => idSafe(part.PartNumber)).includes(idSafe(p.PartNumber))
-  ));
-};
 
-window.updateQuantity = function(partId, delta) {
-  const input = document.getElementById(`qty-${partId}`);
-  let newValue = parseInt(input.value || '1') + delta;
-  if (newValue < 1) newValue = 1;
-  input.value = newValue;
-  
-  const cart = window.loadCart();
-  const item = cart.find(item => idSafe(item.partNumber) === partId);
-  if (item) {
-    item.quantity = newValue;
-    window.saveCart(cart);
-  }
-};
-
-window.updateQuantityInput = function(partId) {
-  const input = document.getElementById(`qty-${partId}`);
-  let newValue = parseInt(input.value || '1');
-  if (newValue < 1) newValue = 1;
-  input.value = newValue;
-  
-  const cart = window.loadCart();
-  const item = cart.find(item => idSafe(item.partNumber) === partId);
-  if (item) {
-    item.quantity = newValue;
-    window.saveCart(cart);
-  }
-};
-
-window.removeFromCart = function(partId) {
-  let cart = window.loadCart();
-  cart = cart.filter(item => idSafe(item.partNumber) !== partId);
-  window.saveCart(cart);
-  syncHeader();
-  
-  // Update the UI
-  displayResults(window.partsData.filter(p => 
-    window.partsData.map(part => idSafe(part.PartNumber)).includes(idSafe(p.PartNumber))
-  ));
-};
-
-window.renderCart = function() {
-  const cart = window.loadCart();
-  
-  if (cart.length === 0) {
-    $cartItems.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-cart"></i><br/> Your cart is empty</div>';
-    $cartTotal.textContent = 'Total: $0.00';
-    return;
-  }
-  
-  let html = '';
-  let total = 0;
-  
-  cart.forEach((item, index) => {
-    const price = parseFloat(item.price || 0);
-    const quantity = parseInt(item.quantity || 1);
-    const itemTotal = price * quantity;
-    total += itemTotal;
-    
-    html += `
-      <div class="cart-item">
-        <div class="cart-item-main" onclick="toggleCartItem(${index})">
-          <div class="cart-item-details">
-            <div class="cart-item-name">
-              ${esc(item.partNumber)}
-              ${item.corePartNumber ? `<span class="cart-item-core-badge">Core</span>` : ''}
-            </div>
-            <div class="cart-item-description">${esc(item.description)}</div>
-            <div class="cart-item-price">${fmtMoney(price, item.currency)} × ${quantity} = ${fmtMoney(itemTotal, item.currency)}</div>
-          </div>
-          <div class="cart-item-expand"><i class="fas fa-chevron-down"></i></div>
-        </div>
-        
-        ${item.corePartNumber ? `
-          <div class="cart-item-core" id="core-${index}">
-            <div class="cart-item-core-content">
-              <div class="cart-item-core-info">
-                <div class="cart-item-core-name">Core Part: ${esc(item.corePartNumber)}</div>
-                <div class="cart-item-core-desc">Core Charge: ${fmtMoney(item.corePrice, item.currency)}</div>
-              </div>
-              <button class="cart-item-remove" onclick="removeCartItem(${index})">
-                <i class="fas fa-trash"></i> Remove
-              </button>
-            </div>
-          </div>
-        ` : `
-          <div class="cart-item-core" id="core-${index}">
-            <div class="cart-item-core-content">
-              <div class="cart-item-core-info">
-                <div class="cart-item-core-name">No core charge for this item</div>
-              </div>
-              <button class="cart-item-remove" onclick="removeCartItem(${index})">
-                <i class="fas fa-trash"></i> Remove
-              </button>
-            </div>
-          </div>
-        `}
-      </div>
-    `;
-  });
-  
-  $cartItems.innerHTML = html;
-  $cartTotal.textContent = `Total: ${fmtMoney(total, window.CURRENCY_FALLBACK)}`;
-};
-
-window.toggleCartItem = function(index) {
-  const coreSection = document.getElementById(`core-${index}`);
-  const expandIcon = document.querySelectorAll('.cart-item-expand')[index];
-  
-  if (coreSection.style.display === 'block') {
-    coreSection.style.display = 'none';
-    expandIcon.classList.remove('open');
-  } else {
-    coreSection.style.display = 'block';
-    expandIcon.classList.add('open');
-  }
-};
-
-window.removeCartItem = function(index) {
-  const cart = window.loadCart();
-  cart.splice(index, 1);
-  window.saveCart(cart);
-  syncHeader();
-  window.renderCart();
-};
-
-// Update cart button
-document.getElementById('update-cart-button').addEventListener('click', function() {
-  window.renderCart();
-  $successMessage.textContent = 'Cart quantities updated successfully';
-  $successMessage.style.display = 'block';
-  setTimeout(() => {
-    $successMessage.style.display = 'none';
-  }, 3000);
-});
-
-// Checkout functionality
-document.getElementById('checkout-button').addEventListener('click', function() {
-  // Validate form
-  const errors = [];
-  
-  if (!$customerEmail.value || !/\S+@\S+\.\S+/.test($customerEmail.value)) {
-    errors.push('Please enter a valid email address');
-    $customerEmail.classList.add('invalid');
-  } else {
-    $customerEmail.classList.remove('invalid');
-  }
-  
-  if (!$customerPhone.value) {
-    errors.push('Please enter your phone number');
-    $customerPhone.classList.add('invalid');
-  } else {
-    $customerPhone.classList.remove('invalid');
-  }
-  
-  if (!$customerName.value) {
-    errors.push('Please enter your name');
-    $customerName.classList.add('invalid');
-  } else {
-    $customerName.classList.remove('invalid');
-  }
-  
-  if (!$customerAddress1.value) {
-    errors.push('Please enter your address');
-    $customerAddress1.classList.add('invalid');
-  } else {
-    $customerAddress1.classList.remove('invalid');
-  }
-  
-  if (!$customerCity.value) {
-    errors.push('Please enter your city');
-    $customerCity.classList.add('invalid');
-  } else {
-    $customerCity.classList.remove('invalid');
-  }
-  
-  if (!$customerState.value) {
-    errors.push('Please enter your state/province');
-    $customerState.classList.add('invalid');
-  } else {
-    $customerState.classList.remove('invalid');
-  }
-  
-  if (!$customerZip.value) {
-    errors.push('Please enter your ZIP/postal code');
-    $customerZip.classList.add('invalid');
-  } else {
-    $customerZip.classList.remove('invalid');
-  }
-  
-  if (!$customerCountry.value) {
-    errors.push('Please select your country');
-    $customerCountry.classList.add('invalid');
-  } else {
-    $customerCountry.classList.remove('invalid');
-  }
-  
-  if (!$paymentMethod.value) {
-    errors.push('Please select a payment method');
-    $paymentMethod.classList.add('invalid');
-  } else {
-    $paymentMethod.classList.remove('invalid');
-  }
-  
-  if (errors.length > 0) {
-    $validationMessage.innerHTML = errors.join('<br>');
-    $validationPopup.style.display = 'flex';
-    return;
-  }
-  
-  // Save customer info
-  const customerInfo = {
-    email: $customerEmail.value,
-    phone: $customerPhone.value,
-    company: $customerCompany.value,
-    name: $customerName.value,
-    address1: $customerAddress1.value,
-    address2: $customerAddress2.value,
-    city: $customerCity.value,
-    state: $customerState.value,
-    zip: $customerZip.value,
-    country: $customerCountry.value,
-    instructions: $customerInstructions.value,
-    engineModel: $engineModel.value,
-    engineSerial: $engineSerial.value
-  };
-  
-  try {
-    localStorage.setItem(CUSTOMER_INFO_KEY, JSON.stringify(customerInfo));
-  } catch (e) {
-    console.warn('Failed to save customer info', e);
-  }
-  
-  // Show loading
-  $loadingOverlay.style.display = 'flex';
-  
-  // Simulate checkout process
-  setTimeout(() => {
-    $loadingOverlay.style.display = 'none';
-    
-    // Show success message
-    $successMessage.textContent = 'Your order has been submitted successfully! We will contact you shortly.';
-    $successMessage.style.display = 'block';
-    
-    // Clear cart
-    window.saveCart([]);
-    syncHeader();
-    
-    // Redirect back to search after delay
-    setTimeout(() => {
-      showView('search');
-      $successMessage.style.display = 'none';
-    }, 5000);
-  }, 2000);
-});
-
-// Close validation popup
-document.getElementById('popup-close-btn').addEventListener('click', function() {
-  $validationPopup.style.display = 'none';
-});
-
-// WhatsApp sharing
-window.shareViaWhatsApp = function(partId) {
-  const part = window.partsData.find(p => idSafe(p.PartNumber) === partId);
-  if (!part) return;
-  
-  const message = `I'm interested in this part: ${part.PartNumber} - ${part.Description}. Price: ${fmtMoney(part.Price, part.Currency)}`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-  
-  window.open(whatsappUrl, '_blank');
-};
-
-// Initialize the application
-init();
-
-// Listen for storage events (for cross-tab synchronization)
-window.addEventListener('storage', function(e) {
-  if (e.key === CART_STORAGE_KEY) {
-    syncHeader();
-    if ($cartView.classList.contains('active')) {
-      window.renderCart();
+  function search(){
+    const query = $in.value.trim();
+    if (!query) { 
+      $results.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><br/>Enter a part number or description to search</div>'; 
+      currentResults = [];
+      return; 
     }
+    $status.innerHTML = '<i class="fas fa-sync fa-spin"></i> Searching...';
+
+    let results = [];
+    if ($exact.checked){
+      const qn = norm(query);
+      const exactMatch = rows.find(r => r.__pn_norm.endsWith(qn));
+      if (exactMatch) results.push({ item: exactMatch, score: 0 });
+      if ($alt.checked){
+        const altMatch = rows.find(r => r.__alts_norm.some(a => a.endsWith(qn)));
+        if (altMatch && (!exactMatch || exactMatch.__pn !== altMatch.__pn)) results.push({ item: altMatch, score: 0.1 });
+      }
+    } else {
+      results = fuseFor(rows).search(query);
+    }
+
+    if ($instock.checked){ 
+      results = results; 
+    }
+    
+    results.sort((a,b)=>(a.score||0)-(b.score||0));
+
+    renderResults(results);
+    
+    if (!results.length){
+      $status.innerHTML = `<i class="fas fa-info-circle"></i> No results for "${esc(query)}"`;
+      return;
+    }
+    
+    $status.innerHTML = `<i class="fas fa-check-circle"></i> Found ${results.length} result(s)`;
   }
-});
+
+  // Wire up event listeners
+  $go.addEventListener('click', search);
+  $in.addEventListener('keypress', e => { if (e.key === 'Enter') search(); });
+  $exact.addEventListener('change', () => {
+    if ($in.value.trim()) search();
+  });
+  $alt.addEventListener('change', () => {
+    if ($in.value.trim()) search();
+  });
+  $instock.addEventListener('change', () => {
+    if ($in.value.trim()) search();
+  });
+
+  // Initial header sync
+  syncHeader(loadCart());
+})();  
 </script>
 </body>
 </html>
